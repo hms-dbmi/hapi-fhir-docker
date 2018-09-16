@@ -1,4 +1,4 @@
-# HAPI-FHIR Tomcat Container
+# DBMI HAPI-FHIR Container
 
 This container runs HAPI-FHIR on Tomcat, proxied by nginx. It is setup
 to run as an AWS ECS container, retrieving run configurations from PS,

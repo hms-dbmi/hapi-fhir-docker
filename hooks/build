@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 # Check for master
 if [[ $SOURCE_BRANCH == "master" ]]; then
