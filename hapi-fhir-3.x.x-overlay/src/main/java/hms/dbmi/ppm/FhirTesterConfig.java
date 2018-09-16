@@ -1,5 +1,10 @@
 package hms.dbmi.ppm;
 
+import hms.dbmi.ppm.DBMITokenAuthInterceptor;
+import hms.dbmi.ppm.TokenVerifier;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -8,6 +13,8 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
 import ca.uhn.fhir.to.TesterConfig;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.context.FhirContext;
 
 
 //@formatter:off
@@ -49,25 +56,34 @@ public class FhirTesterConfig {
 				.withBaseUrl(baseUrl)
 				.withName(serverName + " Tester");
 
-        // Add a client to take the JWT cookie token and put it into the request headers
-        /*
-		ITestingUiClientFactory clientFactory = new ITestingUiClientFactory() {
+        // Check if JWT authn/authz are enabled
+        if(System.getenv("JWT_AUTH_ENABLED") != null) {
+            System.out.println("------------------- JWT AuthN Enabled -------------------");
 
-			@Override
-			public IGenericClient newClient(FhirContext theFhirContext, HttpServletRequest theRequest, String theServerBaseUrl) {
+            // Add a client to take the JWT cookie token and put it into the request headers
+            ITestingUiClientFactory clientFactory = new ITestingUiClientFactory() {
 
-				// Create a client
-				IGenericClient client = theFhirContext.newRestfulGenericClient(theServerBaseUrl);
+                @Override
+                public IGenericClient newClient(FhirContext theFhirContext, HttpServletRequest theRequest, String theServerBaseUrl) {
 
-				// Register an interceptor which adds credentials
-				client.registerInterceptor(
-						new BasicAuthInterceptor(ContextListener.username, ContextListener.password));
+                    // Create a client
+                    IGenericClient client = theFhirContext.newRestfulGenericClient(theServerBaseUrl);
 
-				return client;
-			}
-		};
-		retVal.setClientFactory(clientFactory);
-        */
+                    // Fetch the token
+                    String token = TokenVerifier.getTokenFromCookie(theRequest);
+
+                    // Ensure it's not null
+                    if( token != null) {
+
+                        // Register an interceptor which adds the token as credentials
+                        client.registerInterceptor(new DBMITokenAuthInterceptor(token));
+                    }
+
+                    return client;
+                }
+            };
+            retVal.setClientFactory(clientFactory);
+		}
 
 		return retVal;
 	}
