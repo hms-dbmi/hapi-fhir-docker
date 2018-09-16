@@ -18,6 +18,10 @@
 		</repository>
 	</repositories>
 
+	<properties>
+		<jwt_auth_enabled>${env.JWT_AUTH_ENABLED}</jwt_auth_enabled>
+	</properties>
+
 	<dependencies>
 
 		<!-- This dependency includes the core HAPI-FHIR classes -->
@@ -131,6 +135,14 @@
 
 		<!-- Tells Maven to name the generated WAR file as hapi-fhir-jpaserver-example.war -->
 		<finalName>fhir-server</finalName>
+
+		<!-- Setup application properties from profile -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 
 		<plugins>
 			<!-- Tell Maven which Java source version you want to use -->

@@ -18,7 +18,6 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.model.api.Bundle;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Flag;
@@ -41,6 +40,14 @@ public class JWTAuthorizationInterceptor extends AuthorizationInterceptor {
     @Override
     public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) throws AuthenticationException {
 
+        // Check if disabled
+        if(System.getenv("JWT_DISABLED") != null) {
+
+            // Allow anything
+            return new RuleBuilder()
+                    .allowAll().build();
+        }
+
         // Check for authorization
         String authHeader = theRequestDetails.getHeader("Authorization");
         if( authHeader != null ) {
@@ -62,15 +69,8 @@ public class JWTAuthorizationInterceptor extends AuthorizationInterceptor {
                 } else {
 
                     // Get their email and determine permissions for a user
-                    // TODO: Implement this
                     String email = verifier.getEmail(token);
                     System.out.println("User: " + email);
-
-                    // Create a client
-                    FhirContext theFhirContext = FhirContext.forDstu3();
-                    String baseUrl = System.getenv("FHIR_SERVER_URL");
-                    IGenericClient client = theFhirContext.newRestfulGenericClient(baseUrl);
-                    client.registerInterceptor(new DBMITokenAuthInterceptor(token));
 
                     // Get the Patient DAO
                     PatientResourceProvider patientResourceProvider = (PatientResourceProvider) appContext.getBean("myPatientRpDstu3");
