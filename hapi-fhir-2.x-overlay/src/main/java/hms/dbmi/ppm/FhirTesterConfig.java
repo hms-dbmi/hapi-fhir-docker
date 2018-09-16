@@ -55,29 +55,34 @@ public class FhirTesterConfig {
 				.withBaseUrl(baseUrl)
 				.withName(serverName + " Tester");
 
-        // Add a client to take the JWT cookie token and put it into the request headers
-		ITestingUiClientFactory clientFactory = new ITestingUiClientFactory() {
+        // Check if JWT authn/authz are enabled
+        if(System.getenv("JWT_AUTH_ENABLED") != null) {
+            System.out.println("------------------- JWT AuthN Enabled -------------------");
 
-			@Override
-			public IGenericClient newClient(FhirContext theFhirContext, HttpServletRequest theRequest, String theServerBaseUrl) {
+            // Add a client to take the JWT cookie token and put it into the request headers
+            ITestingUiClientFactory clientFactory = new ITestingUiClientFactory() {
 
-				// Create a client
-				IGenericClient client = theFhirContext.newRestfulGenericClient(theServerBaseUrl);
+                @Override
+                public IGenericClient newClient(FhirContext theFhirContext, HttpServletRequest theRequest, String theServerBaseUrl) {
 
-                // Fetch the token
-                String token = TokenVerifier.getTokenFromCookie(theRequest);
+                    // Create a client
+                    IGenericClient client = theFhirContext.newRestfulGenericClient(theServerBaseUrl);
 
-				// Ensure it's not null
-				if( token != null) {
+                    // Fetch the token
+                    String token = TokenVerifier.getTokenFromCookie(theRequest);
 
-					// Register an interceptor which adds the token as credentials
-					client.registerInterceptor(new DBMITokenAuthInterceptor(token));
-				}
+                    // Ensure it's not null
+                    if( token != null) {
 
-				return client;
-			}
-		};
-		retVal.setClientFactory(clientFactory);
+                        // Register an interceptor which adds the token as credentials
+                        client.registerInterceptor(new DBMITokenAuthInterceptor(token));
+                    }
+
+                    return client;
+                }
+            };
+            retVal.setClientFactory(clientFactory);
+		}
 
 		return retVal;
 	}
