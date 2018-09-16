@@ -18,6 +18,10 @@
 		</repository>
 	</repositories>
 
+	<properties>
+		<jwt_auth_enabled>${env.JWT_AUTH_ENABLED}</jwt_auth_enabled>
+	</properties>
+
 	<dependencies>
 
 		<!-- This dependency includes the core HAPI-FHIR classes -->
@@ -95,6 +99,12 @@
 			<version>5.0.0.RELEASE</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>2.0.1.RELEASE</version>
+		</dependency>
+
 		<!-- You may not need this if you are deploying to an application server which provides database connection pools itself. -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -134,6 +144,14 @@
 
 		<!-- Tells Maven to name the generated WAR file as hapi-fhir-jpaserver-example.war -->
 		<finalName>fhir-server</finalName>
+
+		<!-- Setup application properties from profile -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 
 		<plugins>
 			<!-- Tell Maven which Java source version you want to use -->
