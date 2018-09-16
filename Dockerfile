@@ -1,10 +1,13 @@
 FROM maven:3.5-jdk-8-alpine AS builder
 
+# Install needed packages
+RUN apk -Uuv add bash curl jq
+
 # Set the HAPI-FHIR project to install
-ARG HAPI_FHIR_SRC
+ARG HAPI_FHIR_SRC=hapi-fhir-3.x
 
 # Set the version of HAPI-FHIR to use
-ARG HAPI_FHIR_VERSION
+ARG HAPI_FHIR_VERSION=3.4.0
 
 # Fetch HAPI-FHIR source and build the app
 WORKDIR /usr/src/app/fhir-server

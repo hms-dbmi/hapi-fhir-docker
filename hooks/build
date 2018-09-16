@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+
+# Check for master
+if [[ $SOURCE_BRANCH == "master" ]]; then
+
+    # Get the most recent version
+    HAPI_FHIR_VERSION=$(wget -O- -q "https://api.github.com/repos/jamesagnew/hapi-fhir/releases/latest" | jq -r .tag_name | cut -c 2-)
+    echo "Building :latest, HAPI-FHIR v${HAPI_FHIR_VERSION}"
+
+    # Build the non-overlay version
+    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+
+elif [[ $SOURCE_BRANCH == 2*-overlay ]]; then
+
+    # Get the most recent version
+    HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:3}
+    echo "Building :${SOURCE_BRANCH}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
+
+    # Build the non-overlay version
+    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x-overlay" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+
+elif [[ $SOURCE_BRANCH == 2* ]]; then
+
+    # Get the most recent version
+    HAPI_FHIR_VERSION=${SOURCE_BRANCH}
+    echo "Building :${SOURCE_BRANCH}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
+
+    # Build the non-overlay version
+    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+
+elif [[ $SOURCE_BRANCH == 3*-overlay ]]; then
+
+    # Get the most recent version
+    HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:5}
+    echo "Building :${SOURCE_BRANCH}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
+
+    # Build the non-overlay version
+    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x-overlay" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+
+elif [[ $SOURCE_BRANCH == 3* ]]; then
+
+    # Get the most recent version
+    HAPI_FHIR_VERSION=${SOURCE_BRANCH}
+    echo "Building :${SOURCE_BRANCH}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
+
+    # Build the non-overlay version
+    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+
+fi
