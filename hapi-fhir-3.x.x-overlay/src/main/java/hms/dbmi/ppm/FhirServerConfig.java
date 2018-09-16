@@ -37,6 +37,7 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 @Configuration
 @EnableTransactionManagement()
 @PropertySource("classpath:application.properties")
+@PropertySource(value="file:/usr/local/tomcat/dbmi.application.properties", ignoreResourceNotFound=true)
 public class FhirServerConfig extends BaseJavaConfigDstu3 {
 
 	@Autowired
@@ -143,6 +144,7 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 	@Bean(autowire = Autowire.BY_TYPE)
 	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
 	public IServerInterceptor authenticationInterceptor() {
+        System.out.println("------------------- JWT AuthN Enabled -------------------");
 		JWTAuthenticationInterceptor retVal = new JWTAuthenticationInterceptor();
 		return retVal;
 	}
@@ -150,6 +152,7 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 	@Bean(autowire = Autowire.BY_TYPE)
 	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
 	public IServerInterceptor authorizationInterceptor() {
+        System.out.println("------------------- JWT AuthZ Enabled -------------------");
 		JWTAuthorizationInterceptor retVal = new JWTAuthorizationInterceptor(appContext);
 		return retVal;
 	}

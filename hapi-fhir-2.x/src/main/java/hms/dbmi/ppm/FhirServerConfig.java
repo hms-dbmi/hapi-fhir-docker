@@ -24,6 +24,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.PropertySource;
 
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
@@ -42,6 +43,8 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
  */
 @Configuration
 @EnableTransactionManagement()
+@PropertySource("classpath:application.properties")
+@PropertySource(value="file:/usr/local/tomcat/dbmi.application.properties", ignoreResourceNotFound=true)
 public class FhirServerConfig extends BaseJavaConfigDstu3 {
 
 	@Autowired
@@ -151,15 +154,17 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 	}
 
 	@Bean(autowire = Autowire.BY_TYPE)
-	@ConditionalOnProperty(name="JWT_DISABLED", matchIfMissing=true)
+	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
 	public IServerInterceptor authenticationInterceptor() {
+        System.out.println("------------------- JWT AuthN Enabled -------------------");
 		JWTAuthenticationInterceptor retVal = new JWTAuthenticationInterceptor();
 		return retVal;
 	}
 
 	@Bean(autowire = Autowire.BY_TYPE)
-	@ConditionalOnProperty(name="JWT_DISABLED", matchIfMissing=true)
+	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
 	public IServerInterceptor authorizationInterceptor() {
+        System.out.println("------------------- JWT AuthZ Enabled -------------------");
 		JWTAuthorizationInterceptor retVal = new JWTAuthorizationInterceptor(appContext);
 		return retVal;
 	}

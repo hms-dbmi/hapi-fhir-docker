@@ -47,6 +47,7 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 @Configuration
 @EnableTransactionManagement()
 @PropertySource("classpath:application.properties")
+@PropertySource(value="file:/usr/local/tomcat/dbmi.application.properties", ignoreResourceNotFound=true)
 public class FhirServerConfig extends BaseJavaConfigDstu3 {
 
 	@Autowired

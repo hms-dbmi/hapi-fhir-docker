@@ -40,14 +40,6 @@ public class JWTAuthorizationInterceptor extends AuthorizationInterceptor {
     @Override
     public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) throws AuthenticationException {
 
-        // Check if disabled
-        if(System.getenv("JWT_DISABLED") != null) {
-
-            // Allow anything
-            return new RuleBuilder()
-                    .allowAll().build();
-        }
-
         // Check for authorization
         String authHeader = theRequestDetails.getHeader("Authorization");
         if( authHeader != null ) {
