@@ -9,6 +9,10 @@ ARG HAPI_FHIR_SRC=hapi-fhir-3.x
 # Set the version of HAPI-FHIR to use
 ARG HAPI_FHIR_VERSION=3.4.0
 
+# Enable or disable JWT
+ARG JWT_AUTH_ENABLED=true
+ENV JWT_AUTH_ENABLED=${JWT_AUTH_ENABLED}
+
 # Fetch HAPI-FHIR source and build the app
 WORKDIR /usr/src/app/fhir-server
 
@@ -41,38 +45,36 @@ RUN addgroup -S nginx \
     && pip3 install awscli shinto-cli \
     && rm -rf /var/cache/apk/*
 
-# Copy templates
+# Copy scripts, templates and resources
 ADD docker-entrypoint-templates.d/ /docker-entrypoint-templates.d/
-
-# Setup entry scripts
+ADD docker-entrypoint-resources.d/ /docker-entrypoint-resources.d/
 ADD docker-entrypoint-init.d/ /docker-entrypoint-init.d/
+ADD docker-entrypoint.d/ /docker-entrypoint.d/
+
+# Add the init script and make it executable
 ADD docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod a+x /docker-entrypoint.sh
 
 # Set the build env
-ENV PPM_ENV=prod
+ENV DBMI_ENV=prod
 
 # Set app parameters
-ENV PPM_PARAMETER_STORE_PREFIX=ppm.fhir.${PPM_ENV}
-ENV PPM_PARAMETER_STORE_PRIORITY=true
-ENV PPM_AWS_REGION=us-east-1
-ENV PPM_APP_DOMAIN=ppm-fhir-prod.aws.dbmi.hms.harvard.edu
+ENV DBMI_PARAMETER_STORE_PREFIX=ppm.fhir.${DBMI_ENV}
+ENV DBMI_PARAMETER_STORE_PRIORITY=true
+ENV DBMI_AWS_REGION=us-east-1
+ENV DBMI_APP_DOMAIN=ppm-fhir-prod.aws.dbmi.hms.harvard.edu
 
 # Set nginx and network parameters
-ENV PPM_NGINX_USER=nginx
-ENV PPM_NGINX_PID_PATH=/var/run/nginx.pid
-ENV PPM_PORT=443
-ENV PPM_LB=true
-ENV PPM_SSL=true
-ENV PPM_CREATE_SSL=true
-ENV PPM_SSL_PATH=/etc/nginx/ssl
+ENV DBMI_LB=true
+ENV DBMI_SSL=true
+ENV DBMI_CREATE_SSL=true
 
-ENV PPM_HEALTHCHECK=true
-ENV PPM_HEALTHCHECK_PATH=/healthcheck
-ENV PPM_APP_HEALTHCHECK_PATH=/baseDstu3/metadata
+ENV DBMI_HEALTHCHECK=true
+ENV DBMI_HEALTHCHECK_PATH=/healthcheck
+ENV DBMI_APP_HEALTHCHECK_PATH=/baseDstu3/metadata
 
 # Set FHIR variables
-ENV FHIR_SERVER_URL=https://${PPM_APP_DOMAIN}/baseDstu3
+ENV FHIR_SERVER_URL=https://${DBMI_APP_DOMAIN}/baseDstu3
 ENV FHIR_SERVER_NAME="PPM FHIR Server"
 
 # Copy the WAR file from builder
@@ -80,3 +82,5 @@ RUN rm -rf $CATALINA_HOME/webapps/ROOT
 COPY --from=builder /usr/src/app/fhir-server/target/fhir-server.war $CATALINA_HOME/webapps/ROOT.war
 
 ENTRYPOINT ["dumb-init", "/docker-entrypoint.sh"]
+
+CMD $CATALINA_HOME/bin/catalina.sh run
