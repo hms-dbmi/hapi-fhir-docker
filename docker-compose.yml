@@ -4,16 +4,17 @@ services:
     build:
       context: .
       args:
-        - HAPI_FHIR_SRC=hapi-fhir
+        - HAPI_FHIR_SRC=hapi-fhir-2.x
         - HAPI_FHIR_VERSION=2.5
+        - JWT_AUTH_ENABLED=false
     environment:
-      PPM_SSL:
-      PPM_LB:
-      PPM_CREATE_SSL:
-      PPM_PORT: 8082
-      PPM_PARAMETER_STORE_PREFIX:
-      PPM_PARAMETER_STORE_PRIORITY:
-      PPM_APP_DOMAIN: localhost
+      DBMI_SSL:
+      DBMI_LB:
+      DBMI_CREATE_SSL:
+      DBMI_PORT: 8082
+      DBMI_PARAMETER_STORE_PREFIX:
+      DBMI_PARAMETER_STORE_PRIORITY:
+      DBMI_APP_DOMAIN: localhost
       FHIR_SERVER_NAME: fhir-server
       FHIR_SERVER_URL: http://localhost:8082/baseDstu3
       FHIR_MYSQL_URL: "jdbc:mysql://fhir-database:3306/jpaserver"
@@ -25,7 +26,7 @@ services:
       JWT_HEADER_PREFIX: "JWT "
       JWT_AUTHZ_CLAIM: "http://local.authorization.dbmi.hms.harvard.edu"
       JWT_ADMIN_GROUP: "ppm-admin"
-      JWT_DISABLED:
+      JWT_AUTH_ENABLED: "true"
     ports:
       - 8082:8082
     healthcheck:

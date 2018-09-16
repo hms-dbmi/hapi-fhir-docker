@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Set the default region
-export AWS_DEFAULT_REGION=${PPM_AWS_REGION:=us-east-1}
+export AWS_DEFAULT_REGION=${DBMI_AWS_REGION:=us-east-1}
 
 get_prefix_params() {
   local response
@@ -11,7 +11,7 @@ get_prefix_params() {
 
   response=$(
     aws ssm describe-parameters  \
-      --parameter-filters Key=Name,Option=BeginsWith,Values=${PPM_PARAMETER_STORE_PREFIX} \
+      --parameter-filters Key=Name,Option=BeginsWith,Values=${DBMI_PARAMETER_STORE_PREFIX} \
       --max-items 10 \
       "$@"
   )
@@ -42,7 +42,7 @@ get_path_params() {
     aws ssm get-parameters-by-path \
       --with-decryption \
       --recursive \
-      --path ${PPM_PARAMETER_STORE_PATH} \
+      --path ${DBMI_PARAMETER_STORE_PATH} \
       --max-items 50 \
       "$@"
   )
@@ -84,34 +84,34 @@ params_to_env_no_overwrite () {
 }
 
 # Check environment for path or prefix or both
-if [[ -n $PPM_PARAMETER_STORE_PREFIX ]]; then
+if [[ -n $DBMI_PARAMETER_STORE_PREFIX ]]; then
 
-    (>&2 echo "Getting secrets for prefix: $PPM_PARAMETER_STORE_PREFIX")
-    if [[ -n $PPM_PARAMETER_STORE_PRIORITY ]]; then
+    (>&2 echo "Getting secrets for prefix: $DBMI_PARAMETER_STORE_PREFIX")
+    if [[ -n $DBMI_PARAMETER_STORE_PRIORITY ]]; then
         # Run it
-        params_to_env $PPM_PARAMETER_STORE_PREFIX
+        params_to_env $DBMI_PARAMETER_STORE_PREFIX
     else
         # Run
         (>&2 echo "Will preserve existing environment over values from Parameter Store")
-        params_to_env_no_overwrite $PPM_PARAMETER_STORE_PREFIX
+        params_to_env_no_overwrite $DBMI_PARAMETER_STORE_PREFIX
     fi
 fi
 
 # Check environment for path or prefix or both
-if [[ -n $PPM_PARAMETER_STORE_PATH ]]; then
+if [[ -n $DBMI_PARAMETER_STORE_PATH ]]; then
 
-    (>&2 echo "Getting secrets for path: $PPM_PARAMETER_STORE_PATH")
-    if [[ -n $PPM_PARAMETER_STORE_PRIORITY ]]; then
+    (>&2 echo "Getting secrets for path: $DBMI_PARAMETER_STORE_PATH")
+    if [[ -n $DBMI_PARAMETER_STORE_PRIORITY ]]; then
         # Run it
-        params_to_env $PPM_PARAMETER_STORE_PATH
+        params_to_env $DBMI_PARAMETER_STORE_PATH
     else
         # Run
         (>&2 echo "Will preserve existing environment over values from Parameter Store")
-        params_to_env_no_overwrite $PPM_PARAMETER_STORE_PATH
+        params_to_env_no_overwrite $DBMI_PARAMETER_STORE_PATH
     fi
 fi
 
-if [[ -z $PPM_PARAMETER_STORE_PATH && -z $PPM_PARAMETER_STORE_PREFIX ]]; then
+if [[ -z $DBMI_PARAMETER_STORE_PATH && -z $DBMI_PARAMETER_STORE_PREFIX ]]; then
 
     (>&2 echo "No path or prefix specified, nothing to do")
 

@@ -1,8 +1,8 @@
-user {{ PPM_NGINX_USER }};
+user {{ DBMI_NGINX_USER }};
 
 worker_processes auto;
 
-pid {{ PPM_NGINX_PID_PATH }};
+pid {{ DBMI_NGINX_PID_PATH }};
 
 error_log /dev/stderr;
 
@@ -45,28 +45,60 @@ http {
 	error_log /dev/stderr;
 
     server {
-    {% if PPM_SSL is defined and PPM_SSL %}
+    {% if DBMI_SSL is defined and DBMI_SSL %}
 
-        listen {{ PPM_PORT }} ssl;
-        ssl_certificate "{{ PPM_SSL_PATH }}/{{ PPM_APP_DOMAIN }}.crt";
-        ssl_certificate_key "{{ PPM_SSL_PATH }}/{{ PPM_APP_DOMAIN }}.key";
-
-        error_page 497 https://$host:{{ PPM_PORT }}$request_uri;
+        listen {{ DBMI_PORT }} ssl default_server;
+        ssl_certificate "{{ DBMI_SSL_PATH }}/default.crt";
+        ssl_certificate_key "{{ DBMI_SSL_PATH }}/default.key";
 
     {% else %}
 
-        listen {{ PPM_PORT }};
+        listen {{ DBMI_PORT }} default_server;
 
     {% endif %}
 
-    {% if PPM_LB is defined and PPM_LB %}
+    {% if DBMI_HEALTHCHECK is defined and DBMI_HEALTHCHECK %}
+        include /etc/nginx/conf.d/nginx.healthcheck.conf;
+    {% endif %}
+
+        location / {
+
+            access_log /var/log/nginx/default.access.log;
+            error_log /var/log/nginx/default.error.log error;
+
+            return 444;
+        }
+    }
+
+    server {
+    {% if DBMI_SSL is defined and DBMI_SSL %}
+        listen {{ DBMI_PORT }} ssl;
+        server_name .{{ DBMI_APP_DOMAIN }};
+
+        ssl_certificate "{{ DBMI_SSL_PATH }}/{{ DBMI_APP_DOMAIN }}.crt";
+        ssl_certificate_key "{{ DBMI_SSL_PATH }}/{{ DBMI_APP_DOMAIN }}.key";
+
+        error_page 497 https://$host:{{ DBMI_PORT }}$request_uri;
+
+    {% else %}
+
+        listen {{ DBMI_PORT }};
+        server_name .{{ DBMI_APP_DOMAIN }};
+
+    {% endif %}
+
+    {% if DBMI_HEALTHCHECK is defined and DBMI_HEALTHCHECK %}
+        include /etc/nginx/conf.d/nginx.healthcheck.conf;
+    {% endif %}
+
+    {% if DBMI_LB is defined and DBMI_LB %}
 
         ##
         # AWS Configs
         #   Configure for load balancer
         ##
 
-        set_real_ip_from {{ PPM_LB_SUBNET }};
+        set_real_ip_from {{ DBMI_LB_SUBNET }};
         real_ip_header X-Forwarded-For;
         real_ip_recursive on;
 
@@ -91,34 +123,6 @@ http {
 
             access_log off;
         }
-
-
-    {% if PPM_HEALTHCHECK is defined and PPM_HEALTHCHECK %}
-        location {{ PPM_HEALTHCHECK_PATH }} {
-
-        {% if PPM_LB is defined and PPM_LB %}
-            # Only allow load balancer and local hosts
-            allow {{ PPM_LB_SUBNET }};
-            allow 127.0.0.1;
-            deny all;
-        {% endif %}
-
-        {% if PPM_APP_HEALTHCHECK_PATH is defined %}
-
-            # Proxy to FHIR's healthcheck endpoint
-            proxy_pass   http://127.0.0.1:8080{{ PPM_APP_HEALTHCHECK_PATH }};
-
-        {% else %}
-
-            # Just return 200 to check on NGINX
-            return 200;
-
-        {% endif %}
-
-            # Redirect logs to keep actual logs clean
-            access_log /var/log/nginx/healthcheck.log;
-        }
-    {% endif %}
 
         location / {
             # checks for static file, if not found proxy to app
