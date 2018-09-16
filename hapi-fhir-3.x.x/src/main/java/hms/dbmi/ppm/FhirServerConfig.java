@@ -15,11 +15,15 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.PropertySource;
 
 import ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory;
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
@@ -32,7 +36,12 @@ import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 
 @Configuration
 @EnableTransactionManagement()
+@PropertySource("classpath:application.properties")
+@PropertySource(value="file:/usr/local/tomcat/dbmi.application.properties", ignoreResourceNotFound=true)
 public class FhirServerConfig extends BaseJavaConfigDstu3 {
+
+	@Autowired
+	private ApplicationContext appContext;
 
 	/**
 	 * Configure FHIR properties around the the JPA server via this bean
@@ -133,14 +142,18 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 	}
 
 	@Bean(autowire = Autowire.BY_TYPE)
+	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
 	public IServerInterceptor authenticationInterceptor() {
+        System.out.println("------------------- JWT AuthN Enabled -------------------");
 		JWTAuthenticationInterceptor retVal = new JWTAuthenticationInterceptor();
 		return retVal;
 	}
 
 	@Bean(autowire = Autowire.BY_TYPE)
-	public IServerInterceptor patientAndAdminAuthorizationInterceptor() {
-		JWTAuthorizationInterceptor retVal = new JWTAuthorizationInterceptor();
+	@ConditionalOnProperty(name="dbmi.jwt_auth_enabled", havingValue="true")
+	public IServerInterceptor authorizationInterceptor() {
+        System.out.println("------------------- JWT AuthZ Enabled -------------------");
+		JWTAuthorizationInterceptor retVal = new JWTAuthorizationInterceptor(appContext);
 		return retVal;
 	}
 }

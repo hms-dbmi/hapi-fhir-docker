@@ -18,11 +18,6 @@ public class JWTAuthenticationInterceptor extends InterceptorAdapter {
    @Override
    public boolean incomingRequestPostProcessed(RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse) throws AuthenticationException {
 
-        // Check if disabled
-        if(System.getenv("JWT_DISABLED") != null) {
-            return true;
-        }
-
         // Don't worry about metadata requests
         if( theRequestDetails.getRestOperationType().equals(RestOperationTypeEnum.METADATA) ) {
             return true;
