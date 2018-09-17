@@ -12,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.auth0.jwk.JwkException;
 import com.auth0.jwk.JwkProvider;
 import com.auth0.jwk.UrlJwkProvider;
+import com.auth0.jwk.GuavaCachedJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -49,7 +50,8 @@ class TokenVerifier {
         this.issuer = toUrl(issuer);
 
         // Set the JWK provider
-        this.jwkProvider = new UrlJwkProvider(this.issuer);
+        UrlJwkProvider urlJwkProvider = new UrlJwkProvider(this.issuer);
+        this.jwkProvider = new GuavaCachedJwkProvider(urlJwkProvider);
     }
 
     /**
@@ -111,6 +113,7 @@ class TokenVerifier {
         if (verifier != null) {
             return verifier.verify(idToken);
         }
+
         if (algorithm != null) {
             verifier = JWT.require(algorithm)
                     .withAudience(audience)
@@ -118,6 +121,7 @@ class TokenVerifier {
                     .build();
             return verifier.verify(idToken);
         }
+
         String kid = JWT.decode(idToken).getKeyId();
         PublicKey publicKey = jwkProvider.get(kid).getPublicKey();
         return JWT.require(Algorithm.RSA256((RSAKey) publicKey))

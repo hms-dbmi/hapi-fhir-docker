@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.PropertySource;
 
-import ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory;
+//import ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory;
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
 import ca.uhn.fhir.jpa.util.SubscriptionsRequireManualActivationInterceptorDstu3;
@@ -98,7 +98,15 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 		extraProperties.put("hibernate.cache.use_second_level_cache", "false");
 		extraProperties.put("hibernate.cache.use_structured_entries", "false");
 		extraProperties.put("hibernate.cache.use_minimal_puts", "false");
-		extraProperties.put("hibernate.search.model_mapping", LuceneSearchMappingFactory.class.getName());
+
+		// Check system version
+		try {
+			Class.forName( "ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory" );
+			extraProperties.put("hibernate.search.model_mapping", "ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory");
+		} catch( ClassNotFoundException e ) {
+			// ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory doesn't exist, <= HAPI-FHIR 3.1.0
+		}
+
 		extraProperties.put("hibernate.search.default.directory_provider", "filesystem");
 		extraProperties.put("hibernate.search.default.indexBase", "target/lucenefiles");
 		extraProperties.put("hibernate.search.lucene_version", "LUCENE_CURRENT");

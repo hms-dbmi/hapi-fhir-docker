@@ -18,6 +18,45 @@
 		</repository>
 	</repositories>
 
+	<profiles>
+        <profile>
+            <id>overlay</id>
+            <properties>
+                <overlay-servlet><![CDATA[ -->
+    <servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+		</init-param>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+    <!-- ]]></overlay-servlet>
+			<overlay-servlet-mapping><![CDATA[ -->
+    <servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+    <!-- ]]></overlay-servlet-mapping>
+            </properties>
+        </profile>
+        <profile>
+            <id>default</id>
+            <properties>
+                <overlay-servlet></overlay-servlet>
+                <overlay-servlet-mapping></overlay-servlet-mapping>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
 	<properties>
 		<jwt_auth_enabled>${env.JWT_AUTH_ENABLED}</jwt_auth_enabled>
 	</properties>
@@ -114,6 +153,21 @@
 			<version>3.8</version>
 		</dependency>
 
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-testpage-overlay</artifactId>
+			<version>${env.HAPI_FHIR_VERSION}</version>
+			<type>war</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-testpage-overlay</artifactId>
+			<version>${env.HAPI_FHIR_VERSION}</version>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -140,12 +194,41 @@
 				</configuration>
 			</plugin>
 
+			<!-- The configuration here tells the WAR plugin to include the FHIR Tester overlay. You can omit it if you are not using that feature. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Build-Time>${maven.build.timestamp}</Build-Time>
+						</manifestEntries>
+					</archive>
+					<overlays>
+						<overlay>
+							<groupId>ca.uhn.hapi.fhir</groupId>
+							<artifactId>hapi-fhir-testpage-overlay</artifactId>
+						</overlay>
+					</overlays>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+
 			<!-- This plugin is just a part of the HAPI internal build process, you do not need to incude it in your own projects -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.2</version>
+				<configuration>
+					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 				</configuration>
 			</plugin>
 

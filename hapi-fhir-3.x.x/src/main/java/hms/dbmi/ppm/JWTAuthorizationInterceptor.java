@@ -1,6 +1,7 @@
 package hms.dbmi.ppm;
 
 import hms.dbmi.ppm.TokenVerifier;
+import hms.dbmi.ppm.DBMITokenAuthInterceptor;
 
 import java.util.*;
 

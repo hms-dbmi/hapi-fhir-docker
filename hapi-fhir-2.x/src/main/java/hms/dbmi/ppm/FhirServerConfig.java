@@ -24,7 +24,10 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.PropertyAccessor;
 
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
@@ -63,8 +66,12 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 
 		// Do not reuse searches (2.5+)
 		try {
-			Method method = retVal.getClass().getMethod("setReuseCachedSearchResultsForMillis", Long.class);
-			method.invoke(retVal, null);
+			PropertyAccessor myAccessor = PropertyAccessorFactory.forBeanPropertyAccess(retVal);
+			myAccessor.setPropertyValue("reuseCachedSearchResultsForMillis", null);
+			System.out.println("DaoConfig.reuseCachedSearchResultsForMillis = " + myAccessor.getPropertyValue("reuseCachedSearchResultsForMillis"));
+
+			//Method method = retVal.getClass().getMethod("setReuseCachedSearchResultsForMillis", Long.class);
+			//method.invoke(retVal, null);
 		}
 		catch (Exception e) {
 			System.out.println("DaoConfig.setReuseCachedSearchResultsForMillis() missing, must be HAPI-FHIR 2.4");

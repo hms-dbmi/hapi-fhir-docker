@@ -10,8 +10,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
+import ca.uhn.fhir.rest.method.RequestDetails;
 
 public class JWTAuthenticationInterceptor extends InterceptorAdapter {
 
