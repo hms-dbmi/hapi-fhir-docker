@@ -1,6 +1,7 @@
 package hms.dbmi.ppm;
 
 import hms.dbmi.ppm.TokenVerifier;
+import hms.dbmi.ppm.DBMITokenAuthInterceptor;
 
 import java.util.*;
 
@@ -15,12 +16,12 @@ import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRuleFinished;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.ForbiddenOperationException;
-import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.Bundle;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Flag;
+import ca.uhn.fhir.rest.method.RequestDetails;
 
 import ca.uhn.fhir.jpa.rp.dstu3.PatientResourceProvider;
 import ca.uhn.fhir.jpa.dao.SearchParameterMap;

@@ -33,10 +33,14 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<!-- ${overlay-servlet} -->
+
 	<servlet-mapping>
 		<servlet-name>fhirServlet</servlet-name>
 		<url-pattern>/baseDstu3/*</url-pattern>
 	</servlet-mapping>
+
+	<!-- ${overlay-servlet-mapping} -->
 
 	<!-- This filters provide support for Cross Origin Resource Sharing (CORS) -->
 	<!-- Enable for Javascript client CORS functionality
