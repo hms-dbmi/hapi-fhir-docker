@@ -1,13 +1,14 @@
 FROM maven:3.5-jdk-8-alpine AS builder
 
-# Install needed packages
-RUN apk -Uuv add bash curl jq
-
 # Set the HAPI-FHIR project to install
 ARG HAPI_FHIR_SRC=hapi-fhir-3.x
 
 # Set the version of HAPI-FHIR to use
 ARG HAPI_FHIR_VERSION=3.4.0
+ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
+
+# Enable the overlay by defining this argument
+ARG HAPI_FHIR_PROFILE=overlay
 
 # Enable or disable JWT
 ARG JWT_AUTH_ENABLED=true
@@ -21,13 +22,13 @@ COPY ${HAPI_FHIR_SRC}/pom.xml /usr/src/app/fhir-server/
 COPY ${HAPI_FHIR_SRC}/settings.xml /usr/src/app/fhir-server/
 
 # Bring down packages first and cache them and save millions of minutes
-RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml
+RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_PROFILE}
 
 # Copy our own source files over next
 COPY ${HAPI_FHIR_SRC} /usr/src/app/fhir-server
 
 # Build the final WAR
-RUN mvn package -s /usr/src/app/fhir-server/settings.xml
+RUN mvn package -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_PROFILE}
 
 FROM tomcat:8-alpine
 
@@ -59,10 +60,10 @@ RUN chmod a+x /docker-entrypoint.sh
 ENV DBMI_ENV=prod
 
 # Set app parameters
-ENV DBMI_PARAMETER_STORE_PREFIX=ppm.fhir.${DBMI_ENV}
+ENV DBMI_PARAMETER_STORE_PREFIX=dbmi.fhir.${DBMI_ENV}
 ENV DBMI_PARAMETER_STORE_PRIORITY=true
 ENV DBMI_AWS_REGION=us-east-1
-ENV DBMI_APP_DOMAIN=ppm-fhir-prod.aws.dbmi.hms.harvard.edu
+ENV DBMI_APP_DOMAIN=__fhir_app_domain__
 
 # Set nginx and network parameters
 ENV DBMI_LB=true
@@ -75,7 +76,7 @@ ENV DBMI_APP_HEALTHCHECK_PATH=/baseDstu3/metadata
 
 # Set FHIR variables
 ENV FHIR_SERVER_URL=https://${DBMI_APP_DOMAIN}/baseDstu3
-ENV FHIR_SERVER_NAME="PPM FHIR Server"
+ENV FHIR_SERVER_NAME="DBMI FHIR Server"
 
 # Copy the WAR file from builder
 RUN rm -rf $CATALINA_HOME/webapps/ROOT
