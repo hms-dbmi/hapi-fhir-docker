@@ -4,8 +4,9 @@ services:
     build:
       context: .
       args:
-        - HAPI_FHIR_SRC=hapi-fhir-2.x
-        - HAPI_FHIR_VERSION=2.5
+        - HAPI_FHIR_SRC=hapi-fhir-3.x.x-overlay
+        - HAPI_FHIR_VERSION=3.0.0
+        - HAPI_FHIR_PROFILE=overlay
         - JWT_AUTH_ENABLED=false
     environment:
       DBMI_SSL:
@@ -26,7 +27,7 @@ services:
       JWT_HEADER_PREFIX: "JWT "
       JWT_AUTHZ_CLAIM: "http://local.authorization.dbmi.hms.harvard.edu"
       JWT_ADMIN_GROUP: "ppm-admin"
-      JWT_AUTH_ENABLED: "true"
+      JWT_AUTH_ENABLED: "false"
     ports:
       - 8082:8082
     healthcheck:
