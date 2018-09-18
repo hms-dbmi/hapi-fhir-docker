@@ -24,8 +24,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.PropertyAccessor;
 
-//import ca.uhn.fhir.jpa.search.LuceneSearchMappingFactory;
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
 import ca.uhn.fhir.jpa.util.SubscriptionsRequireManualActivationInterceptorDstu3;
@@ -53,6 +54,10 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 		retVal.setSubscriptionPollDelay(5000);
 		retVal.setSubscriptionPurgeInactiveAfterMillis(DateUtils.MILLIS_PER_HOUR);
 		retVal.setAllowMultipleDelete(true);
+
+		// Disable search caching
+		retVal.setReuseCachedSearchResultsForMillis(null);
+
 		return retVal;
 	}
 
