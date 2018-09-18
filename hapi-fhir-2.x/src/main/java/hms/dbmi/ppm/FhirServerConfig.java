@@ -69,9 +69,6 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
 			PropertyAccessor myAccessor = PropertyAccessorFactory.forBeanPropertyAccess(retVal);
 			myAccessor.setPropertyValue("reuseCachedSearchResultsForMillis", null);
 			System.out.println("DaoConfig.reuseCachedSearchResultsForMillis = " + myAccessor.getPropertyValue("reuseCachedSearchResultsForMillis"));
-
-			//Method method = retVal.getClass().getMethod("setReuseCachedSearchResultsForMillis", Long.class);
-			//method.invoke(retVal, null);
 		}
 		catch (Exception e) {
 			System.out.println("DaoConfig.setReuseCachedSearchResultsForMillis() missing, must be HAPI-FHIR 2.4");
