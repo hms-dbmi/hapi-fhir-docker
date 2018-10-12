@@ -1,11 +1,13 @@
 version: '2.3'
 services:
   fhir-server:
+    image: hmsdbmitc/hapi-fhir:3.5.0-overlay
     build:
       context: .
       args:
-        - HAPI_FHIR_SRC=hapi-fhir-3.x.x-overlay
-        - HAPI_FHIR_VERSION=3.0.0
+        - HAPI_FHIR_SRC=hapi-fhir-3.x.x
+        - HAPI_FHIR_VERSION=3.5.0
+        - DBMI_HAPI_FHIR_VERSION=0.2.1
         - HAPI_FHIR_PROFILE=overlay
         - JWT_AUTH_ENABLED=false
     environment:

@@ -56,7 +56,7 @@ public class FhirTesterConfig {
 				.withName(serverName + " Tester");
 
         // Check if JWT authn/authz are enabled
-        if(System.getenv("JWT_AUTH_ENABLED").equals("true")) {
+        if(System.getenv("JWT_AUTH_ENABLED") != null && System.getenv("JWT_AUTH_ENABLED").equals("true")) {
             System.out.println("------------------- JWT AuthN Enabled -------------------");
 
             // Add a client to take the JWT cookie token and put it into the request headers

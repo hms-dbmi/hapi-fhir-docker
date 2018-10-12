@@ -3,8 +3,12 @@ FROM maven:3.5-jdk-8-alpine AS builder
 # Set the HAPI-FHIR project to install
 ARG HAPI_FHIR_SRC=hapi-fhir-3.x
 
+# Set the version of the build
+ARG DBMI_HAPI_FHIR_VERSION
+ENV DBMI_HAPI_FHIR_VERSION=${DBMI_HAPI_FHIR_VERSION}
+
 # Set the version of HAPI-FHIR to use
-ARG HAPI_FHIR_VERSION=3.4.0
+ARG HAPI_FHIR_VERSION=3.5.0
 ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
 
 # Enable the overlay by defining this argument
@@ -63,7 +67,6 @@ ENV DBMI_ENV=prod
 ENV DBMI_PARAMETER_STORE_PREFIX=dbmi.fhir.${DBMI_ENV}
 ENV DBMI_PARAMETER_STORE_PRIORITY=true
 ENV DBMI_AWS_REGION=us-east-1
-ENV DBMI_APP_DOMAIN=__fhir_app_domain__
 
 # Set nginx and network parameters
 ENV DBMI_LB=true

@@ -4,6 +4,7 @@
 :   ${FHIR_MYSQL_URL?: must be defined}
 :   ${FHIR_MYSQL_USERNAME?: must be defined}
 :   ${FHIR_MYSQL_PASSWORD?: must be defined}
+:   ${DBMI_APP_DOMAIN?: must be defined}
 
 # Check static file envs
 if [ ! -z $JWT_AUTH_ENABLED ]; then

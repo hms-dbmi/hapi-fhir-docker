@@ -3,7 +3,7 @@
 
     <groupId>hms.dbmi.ppm</groupId>
     <artifactId>fhir-server</artifactId>
-    <version>1.0</version>
+    <version>${env.DBMI_HAPI_FHIR_VERSION}</version>
     <packaging>war</packaging>
 
 	<name>PPM FHIR Server</name>

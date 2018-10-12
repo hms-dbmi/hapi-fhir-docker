@@ -7,7 +7,7 @@ if [[ $SOURCE_BRANCH == "master" ]]; then
 
     # Get the most recent version (can't do this while Docker's build environment doesn't support wget, let alone jq)
     #HAPI_FHIR_VERSION=$(wget -O- -q "https://api.github.com/repos/jamesagnew/hapi-fhir/releases/latest" | jq -r .tag_name | cut -c 2-)
-    HAPI_FHIR_VERSION=3.4.0
+    HAPI_FHIR_VERSION=3.5.0
     echo "Building :latest, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
