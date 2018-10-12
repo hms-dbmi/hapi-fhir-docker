@@ -9,7 +9,7 @@ services:
         - HAPI_FHIR_VERSION=3.5.0
         - DBMI_HAPI_FHIR_VERSION=0.2.1
         - HAPI_FHIR_PROFILE=overlay
-        - JWT_AUTH_ENABLED=false
+        - JWT_AUTH_ENABLED=true
     environment:
       DBMI_SSL:
       DBMI_LB:

@@ -11,44 +11,48 @@ if [[ $SOURCE_BRANCH == "master" ]]; then
     echo "Building :latest, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
-    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${DBMI_HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
 
 elif [[ $SOURCE_BRANCH =~ ^[0-9]\.[0-9]\.[0-9]-2\.[0-9]-overlay$ ]]; then
 
     # Get the most recent version
     HAPI_FHIR_VERSION=${SOURCE_BRANCH:6:3}
+    DBMI_HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:5}
     TAG=${SOURCE_BRANCH:(-11)}
     echo "Building :${TAG}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
-    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_PROFILE="overlay" -t ${IMAGE_NAME} .
+    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${DBMI_HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_PROFILE="overlay" -t ${IMAGE_NAME} .
 
 elif [[ $SOURCE_BRANCH =~ ^[0-9]\.[0-9]\.[0-9]-2\.[0-9]$ ]]; then
 
     # Get the most recent version
     HAPI_FHIR_VERSION=${SOURCE_BRANCH:6:3}
+    DBMI_HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:5}
     echo "Building :${HAPI_FHIR_VERSION}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
-    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${DBMI_HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
 
 elif [[ $SOURCE_BRANCH =~ ^[0-9]\.[0-9]\.[0-9]-3\.[0-9]\.[0-9]-overlay$ ]]; then
 
     # Get the most recent version
     HAPI_FHIR_VERSION=${SOURCE_BRANCH:6:5}
+    DBMI_HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:5}
     TAG=${SOURCE_BRANCH:(-13)}
     echo "Building :${TAG}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
-    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_PROFILE="overlay" -t ${IMAGE_NAME} .
+    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${DBMI_HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_PROFILE="overlay" -t ${IMAGE_NAME} .
 
 elif [[ $SOURCE_BRANCH =~ ^[0-9]\.[0-9]\.[0-9]-3\.[0-9]\.[0-9]$ ]]; then
 
     # Get the most recent version
     HAPI_FHIR_VERSION=${SOURCE_BRANCH:6:5}
+    DBMI_HAPI_FHIR_VERSION=${SOURCE_BRANCH:0:5}
     echo "Building :${HAPI_FHIR_VERSION}, HAPI-FHIR v${HAPI_FHIR_VERSION}"
 
     # Build the non-overlay version
-    docker build --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
+    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${DBMI_HAPI_FHIR_VERSION}" --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${HAPI_FHIR_VERSION}" -t ${IMAGE_NAME} .
 
 fi
