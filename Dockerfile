@@ -79,6 +79,7 @@ ENV DBMI_APP_HEALTHCHECK_PATH=/baseDstu3/metadata
 
 # Set FHIR variables
 ENV FHIR_SERVER_URL=https://${DBMI_APP_DOMAIN}/baseDstu3
+ENV FHIR_INTERNAL_SERVER_URL=http://localhost:8080/baseDstu3
 ENV FHIR_SERVER_NAME="DBMI FHIR Server"
 
 # Copy the WAR file from builder

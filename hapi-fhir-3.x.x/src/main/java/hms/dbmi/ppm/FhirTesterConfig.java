@@ -47,7 +47,7 @@ public class FhirTesterConfig {
 	@Bean
 	public TesterConfig testerConfig() {
 		TesterConfig retVal = new TesterConfig();
-		String baseUrl = System.getenv("FHIR_SERVER_URL");
+		String baseUrl = System.getenv("FHIR_INTERNAL_SERVER_URL");
 		String serverName = System.getenv("FHIR_SERVER_NAME");
 		retVal
 			.addServer()
