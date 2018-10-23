@@ -75,10 +75,10 @@ params_to_env_no_overwrite () {
     # Check the query type
     case "$1" in
     /*)
-        eval `get_path_params | jq -r '"export \(.key)={\(.key):-"\(.value)\"}"'`
+        eval `get_path_params | jq -r '"export \(.key)=${\(.key):-"\(.value)\"}"'`
         ;;
     *)
-        eval `get_prefix_params | jq -r '"export \(.key)={\(.key):-\"\(.value)\"}"'`
+        eval `get_prefix_params | jq -r '"export \(.key)=${\(.key):-\"\(.value)\"}"'`
         ;;
     esac
 }
