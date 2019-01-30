@@ -4,7 +4,7 @@
 $(aws ecr get-login --no-include-email --region us-east-1)
 
 # Set the build
-VERSION="0.1.2"
+VERSION="0.3.0"
 
 # Build 3.x.x versions
 VERSIONS_3="3.5.0,3.4.0,3.3.0,3.2.0,3.1.0,3.0.0"

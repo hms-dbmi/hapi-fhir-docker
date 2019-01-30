@@ -7,7 +7,7 @@ services:
       args:
         - HAPI_FHIR_SRC=hapi-fhir-3.x.x
         - HAPI_FHIR_VERSION=3.5.0
-        - DBMI_HAPI_FHIR_VERSION=0.2.1
+        - DBMI_HAPI_FHIR_VERSION=0.3.0
         - HAPI_FHIR_PROFILE=overlay
         - JWT_AUTH_ENABLED=true
     environment:
