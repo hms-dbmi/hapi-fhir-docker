@@ -28,6 +28,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.PropertyAccessor;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 import ca.uhn.fhir.jpa.config.BaseJavaConfigDstu3;
 import ca.uhn.fhir.jpa.dao.DaoConfig;
@@ -171,5 +173,15 @@ public class FhirServerConfig extends BaseJavaConfigDstu3 {
         System.out.println("------------------- JWT AuthZ Enabled -------------------");
 		JWTAuthorizationInterceptor retVal = new JWTAuthorizationInterceptor(appContext);
 		return retVal;
+	}
+
+	@Bean
+	public HandlerExceptionResolver sentryExceptionResolver() {
+		return new io.sentry.spring.SentryExceptionResolver();
+	}
+
+	@Bean
+	public ServletContextInitializer sentryServletContextInitializer() {
+		return new io.sentry.spring.SentryServletContextInitializer();
 	}
 }
