@@ -1,7 +1,7 @@
 FROM maven:3.5-jdk-8-alpine AS builder
 
 # Set the HAPI-FHIR project to install
-ARG HAPI_FHIR_SRC=hapi-fhir-3.x
+ARG HAPI_FHIR_SRC=hapi-fhir-3.x.x
 
 # Set the version of the build
 ARG DBMI_HAPI_FHIR_VERSION
@@ -12,7 +12,7 @@ ARG HAPI_FHIR_VERSION=3.5.0
 ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
 
 # Enable the overlay by defining this argument
-ARG HAPI_FHIR_PROFILE=overlay
+ARG HAPI_FHIR_PROFILE=overlay-${HAPI_FHIR_VERSION}
 
 # Enable or disable JWT
 ARG JWT_AUTH_ENABLED=true
@@ -26,13 +26,15 @@ COPY ${HAPI_FHIR_SRC}/pom.xml /usr/src/app/fhir-server/
 COPY ${HAPI_FHIR_SRC}/settings.xml /usr/src/app/fhir-server/
 
 # Bring down packages first and cache them and save millions of minutes
-RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_PROFILE}
+RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml \
+    -P ${HAPI_FHIR_PROFILE}
 
 # Copy our own source files over next
 COPY ${HAPI_FHIR_SRC} /usr/src/app/fhir-server
 
 # Build the final WAR
-RUN mvn package -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_PROFILE}
+RUN mvn package -s /usr/src/app/fhir-server/settings.xml \
+    -P ${HAPI_FHIR_PROFILE}
 
 FROM tomcat:8-alpine
 
