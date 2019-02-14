@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Login to ECR
-$(aws ecr get-login --no-include-email --region us-east-1)
-
 # Set the build
 VERSION="0.3.1"
 
