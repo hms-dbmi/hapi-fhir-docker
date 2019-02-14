@@ -12,7 +12,7 @@ ARG HAPI_FHIR_VERSION=3.6.0
 ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
 
 # Enable the overlay by defining this argument
-ARG HAPI_FHIR_PROFILE=${HAPI_FHIR_VERSION}-overlay
+ARG HAPI_FHIR_PROFILE=default
 
 # Enable or disable JWT
 ARG JWT_AUTH_ENABLED=true
@@ -27,14 +27,14 @@ COPY ${HAPI_FHIR_SRC}/settings.xml /usr/src/app/fhir-server/
 
 # Bring down packages first and cache them and save millions of minutes
 RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE}
+    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION}
 
 # Copy our own source files over next
 COPY ${HAPI_FHIR_SRC} /usr/src/app/fhir-server
 
 # Build the final WAR
 RUN mvn package -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE}
+    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION}
 
 FROM tomcat:8-alpine
 

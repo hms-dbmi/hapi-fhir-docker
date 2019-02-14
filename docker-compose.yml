@@ -1,14 +1,14 @@
 version: '2.3'
 services:
   fhir-server:
-    image: hmsdbmitc/ppm-fhir:3.6.0
+    image: hmsdbmitc/ppm-fhir:3.2.0
     build:
       context: .
       args:
-        - HAPI_FHIR_VERSION=3.6.0
+        - HAPI_FHIR_VERSION=3.2.0
         - FHIR_VERSION=Dstu3
         - DBMI_HAPI_FHIR_VERSION=0.3.0
-        - HAPI_FHIR_PROFILE=3.6.0
+        - HAPI_FHIR_PROFILE=default
         - JWT_AUTH_ENABLED=true
         - HAPI_FHIR_SRC=hapi-fhir-3.x.x
     environment:

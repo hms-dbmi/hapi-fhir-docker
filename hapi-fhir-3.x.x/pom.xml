@@ -20,7 +20,7 @@
 
 	<profiles>
 		<profile>
-			<id>3.6.0-overlay</id>
+			<id>overlay</id>
 			<properties>
 				<overlay-servlet><![CDATA[ -->
     <servlet>
@@ -43,190 +43,21 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
     <!-- ]]></overlay-servlet-mapping>
-				<spring-version>5.0.8.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
-			</properties>
-		</profile>
-        <profile>
-            <id>3.5.0-overlay</id>
-            <properties>
-                <overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-			<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-			<spring-version>5.0.8.RELEASE</spring-version>
-			<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-			<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
-            </properties>
-        </profile>
-		<profile>
-			<id>3.4.0-overlay</id>
-			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-				<spring-version>5.0.3.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
 			</properties>
 		</profile>
 		<profile>
-			<id>3.3.0-overlay</id>
+			<id>default</id>
 			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-				<spring-version>5.0.3.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
+				<overlay-servlet></overlay-servlet>
+				<overlay-servlet-mapping></overlay-servlet-mapping>
 			</properties>
-		</profile>
-		<profile>
-			<id>3.2.0-overlay</id>
-			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-				<spring-version>5.0.0.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
-			</properties>
-		</profile>
-		<profile>
-			<id>3.1.0-overlay</id>
-			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-				<spring-version>5.0.0.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
-			</properties>
-		</profile>
-		<profile>
-			<id>3.0.0-overlay</id>
-			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-				<spring-version>4.3.10.RELEASE</spring-version>
-				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
-				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
-			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 		<profile>
 			<id>3.6.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>5.0.8.RELEASE</spring-version>
 				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
@@ -238,8 +69,6 @@
 		<profile>
 			<id>3.5.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>5.0.8.RELEASE</spring-version>
 				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
@@ -256,8 +85,6 @@
 		<profile>
 			<id>3.3.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>5.0.3.RELEASE</spring-version>
 				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
@@ -266,8 +93,6 @@
 		<profile>
 			<id>3.2.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>5.0.0.RELEASE</spring-version>
 				<spring-boot-data-version>2.0.7.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
@@ -276,8 +101,6 @@
 		<profile>
 			<id>3.1.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>5.0.0.RELEASE</spring-version>
 				<spring-boot-data-version>2.0.1.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
@@ -286,10 +109,8 @@
 		<profile>
 			<id>3.0.0</id>
 			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
 				<spring-version>4.3.10.RELEASE</spring-version>
-				<spring-boot-data-version>1.11.6.RELEASE</spring-boot-data-version>
+				<spring-boot-data-version>2.0.1.RELEASE</spring-boot-data-version>
 				<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
 			</properties>
 		</profile>
@@ -370,11 +191,11 @@
 		</dependency>
 
 		<!-- Spring Web is used to deploy the server to a web container. -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring-version}</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.springframework</groupId>-->
+			<!--<artifactId>spring-web</artifactId>-->
+			<!--<version>${spring-version}</version>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -399,7 +220,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>6.0.5</version>
+            <version>8.0.15</version>
         </dependency>
 
         <!-- JWT-->
@@ -493,46 +314,3 @@
 		</plugins>
 	</build>
 </project>
-
-<!-- 3.6.0
-<spring_version>5.0.8.RELEASE</spring_version>
-<spring_data_version>2.0.7.RELEASE</spring_data_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.5.0
-<spring_version>5.0.8.RELEASE</spring_version>
-<spring_data_version>2.0.7.RELEASE</spring_data_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.4.0
-<spring_version>5.0.3.RELEASE</spring_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.3.0
-<spring_version>5.0.3.RELEASE</spring_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.9.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.2.0
-<spring_version>5.0.0.RELEASE</spring_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.1.0
-<spring_version>5.0.0.RELEASE</spring_version>
-<spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
--->
-
-<!-- 3.0.0
-<spring_version>4.3.10.RELEASE</spring_version>
-<thymeleaf-version>3.0.7.RELEASE</thymeleaf-version>
--->
