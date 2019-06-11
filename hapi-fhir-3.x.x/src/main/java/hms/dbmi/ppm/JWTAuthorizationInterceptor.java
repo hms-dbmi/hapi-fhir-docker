@@ -23,7 +23,7 @@ import org.hl7.fhir.dstu3.model.Flag;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 import ca.uhn.fhir.jpa.rp.dstu3.PatientResourceProvider;
-import ca.uhn.fhir.jpa.dao.SearchParameterMap;
+import ca.uhn.fhir.jpa.dao.SearchParameterMap; // HAPI-FHIR 3.7.0+ : ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 
