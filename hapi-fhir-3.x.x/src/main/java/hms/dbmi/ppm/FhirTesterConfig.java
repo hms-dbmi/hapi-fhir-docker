@@ -47,17 +47,16 @@ public class FhirTesterConfig {
 	@Bean
 	public TesterConfig testerConfig() {
 		TesterConfig retVal = new TesterConfig();
-		String baseUrl = System.getenv("FHIR_INTERNAL_SERVER_URL");
-		String serverName = System.getenv("FHIR_SERVER_NAME");
 		retVal
 			.addServer()
-				.withId("home")
-				.withFhirVersion(FhirVersionEnum.DSTU3)
-				.withBaseUrl(baseUrl)
-				.withName(serverName + " Tester");
+			.withId(HapiProperties.getServerId())
+			.withFhirVersion(HapiProperties.getFhirVersion())
+			.withBaseUrl(HapiProperties.getServerAddress())
+			.withName(HapiProperties.getServerName());
+		retVal.setRefuseToFetchThirdPartyUrls(HapiProperties.getTesterConfigRefustToFetchThirdPartyUrls());
 
         // Check if JWT authn/authz are enabled
-        if(System.getenv("JWT_AUTH_ENABLED") != null && System.getenv("JWT_AUTH_ENABLED").equals("true")) {
+        if(HapiProperties.getJwtAuthenticationEnabled()) {
             System.out.println("------------------- JWT AuthN Enabled -------------------");
 
             // Add a client to take the JWT cookie token and put it into the request headers

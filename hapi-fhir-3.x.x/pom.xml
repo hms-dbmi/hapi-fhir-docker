@@ -19,6 +19,24 @@
 	</repositories>
 
 	<profiles>
+
+		<!-- These profiles determine what, if any, request authentication will be used -->
+		<profile>
+			<id>open</id>
+			<properties>
+				<auth-profile>open</auth-profile>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>jwt</id>
+			<properties>
+				<auth-profile>jwt</auth-profile>
+			</properties>
+		</profile>
+
 		<profile>
 			<id>overlay</id>
 			<properties>
@@ -55,8 +73,51 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
+
+		<!-- These profiles determine the version of FHIR to activate -->
+		<profile>
+			<id>DSTU2</id>
+			<properties>
+				<fhir-version>DSTU2</fhir-version>
+				<fhir-servlet-mapping><![CDATA[ -->
+    <servlet-mapping>
+		<servlet-name>fhirServlet</servlet-name>
+		<url-pattern>/baseDstu2/*</url-pattern>
+	</servlet-mapping>
+    <!-- ]]></fhir-servlet-mapping>
+			</properties>
+		</profile>
+		<profile>
+			<id>DSTU3</id>
+			<properties>
+				<fhir-version>DSTU3</fhir-version>
+				<fhir-servlet-mapping><![CDATA[ -->
+    <servlet-mapping>
+		<servlet-name>fhirServlet</servlet-name>
+		<url-pattern>/baseDstu3/*</url-pattern>
+	</servlet-mapping>
+    <!-- ]]></fhir-servlet-mapping>
+			</properties>
+		</profile>
+		<profile>
+			<id>R4</id>
+			<properties>
+				<fhir-version>R4</fhir-version>
+				<fhir-servlet-mapping><![CDATA[ -->
+    <servlet-mapping>
+		<servlet-name>fhirServlet</servlet-name>
+		<url-pattern>/fhir/*</url-pattern>
+	</servlet-mapping>
+    <!-- ]]></fhir-servlet-mapping>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+
 		<!-- These versions intrdoduce errors with ParameterSearchMap and IServiceInterceptor classes and
-			 are currently unsupported.
+			 are currently unsupported. -->
+		<!--
 		<profile>
 			<id>3.8.0</id>
 			<properties>
