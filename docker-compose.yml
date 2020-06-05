@@ -1,29 +1,32 @@
 version: '2.3'
 services:
   fhir-server:
-    image: hmsdbmitc/ppm-fhir:3.6.0
+    image: hmsdbmitc/ppm-fhir:${HAPI_FHIR_VERSION}
     build:
       context: .
       args:
-        - HAPI_FHIR_VERSION=3.6.0
-        - FHIR_VERSION=Dstu3
-        - DBMI_HAPI_FHIR_VERSION=0.3.1
-        - HAPI_FHIR_PROFILE=overlay
-        - JWT_AUTH_ENABLED=true
-        - HAPI_FHIR_SRC=hapi-fhir-3.x.x
+        - HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
+        - DBMI_HAPI_FHIR_VERSION=${DBMI_HAPI_FHIR_VERSION}
+        - HAPI_FHIR_PROFILE=${OVERLAY_PROFILE}
+        - HAPI_FHIR_SRC=${HAPI_FHIR_SRC}
+        - FHIR_VERSION=${FHIR_VERSION}
+        - AUTH_PROFILE=${AUTH_PROFILE}
     environment:
       DBMI_SSL:
       DBMI_LB:
       DBMI_CREATE_SSL:
-      DBMI_PORT: 8082
+      DBMI_PORT: ${PORT}
       DBMI_PARAMETER_STORE_PREFIX:
       DBMI_PARAMETER_STORE_PRIORITY:
       DBMI_APP_DOMAIN: localhost
       FHIR_SERVER_NAME: fhir-server
-      FHIR_SERVER_URL: http://localhost:8082/baseDstu3
-      FHIR_MYSQL_URL: "jdbc:mysql://fhir-database:3306/jpaserver"
-      FHIR_MYSQL_USERNAME: "hapi"
-      FHIR_MYSQL_PASSWORD: "tmEqWELhq6ThfbrM"
+      FHIR_MYSQL_URL: "jdbc:mysql://fhir-database:3306/${HAPI_FHIR_MYSQL_DATABASE}"
+      FHIR_MYSQL_USERNAME: ${HAPI_FHIR_MYSQL_USERNAME}
+      FHIR_MYSQL_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
+      HAPI_DATASOURCE_DRIVER: "com.mysql.jdbc.Driver"
+      HAPI_DATASOURCE_URL: "jdbc:mysql://fhir-database:3306/${HAPI_FHIR_MYSQL_DATABASE}"
+      HAPI_DATASOURCE_USERNAME: ${HAPI_FHIR_MYSQL_USERNAME}
+      HAPI_DATASOURCE_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
       JWT_ISSUER: https://dbmiauth-local.auth0.com/
       JWT_AUDIENCE: riTKsD6l6tAC5hIcSzF7DFZ1VRh32sqf
       JWT_COOKIE_NAME: DBMI_JWT
@@ -31,11 +34,15 @@ services:
       JWT_AUTHZ_CLAIM: "http://local.authorization.dbmi.hms.harvard.edu"
       JWT_ADMIN_GROUP: "ppm-admin"
       JWT_AUTH_ENABLED: "false"
+      AUTH_PROFILE: ${AUTH_PROFILE}
       SENTRY_DSN:
+      DBMI_APP_HEALTHCHECK_PATH: /${FHIR_ROOT}/metadata
+      FHIR_SERVER_URL: http://localhost:${PORT}/${FHIR_ROOT}
+      HAPI_SERVER_ADDRESS: http://localhost:${PORT}/${FHIR_ROOT}
     ports:
-      - 8082:8082
+      - ${PORT}:${PORT}
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8082/healthcheck || exit 1"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:${PORT}/healthcheck || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -46,14 +53,14 @@ services:
   fhir-database:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: "jdw7d93N9fbdawM"
-      MYSQL_DATABASE: 'jpaserver'
-      MYSQL_USER: 'hapi'
-      MYSQL_PASSWORD: 'tmEqWELhq6ThfbrM'
+      MYSQL_ROOT_PASSWORD: ${HAPI_FHIR_MYSQL_ROOT}
+      MYSQL_DATABASE: ${HAPI_FHIR_MYSQL_DATABASE}
+      MYSQL_USER: ${HAPI_FHIR_MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
     ports:
       - 3306:3306
     healthcheck:
-      test: mysqladmin ping -uroot -pjdw7d93N9fbdawM
+      test: mysqladmin ping -uroot -p${HAPI_FHIR_MYSQL_ROOT}
       interval: 15s
       timeout: 5s
       retries: 15
