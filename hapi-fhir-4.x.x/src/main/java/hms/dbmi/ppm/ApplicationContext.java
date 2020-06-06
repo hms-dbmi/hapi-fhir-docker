@@ -2,6 +2,11 @@ package hms.dbmi.ppm;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+//#if hapi_fhir_version=="5.0.0"
+import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
+//#else
+//$import ca.uhn.fhir.jpa.config.WebsocketDispatcherConfig;
+//#endif
 
 public class ApplicationContext extends AnnotationConfigWebApplicationContext {
 
@@ -20,7 +25,7 @@ public class ApplicationContext extends AnnotationConfigWebApplicationContext {
         }
 
         if (HapiProperties.getSubscriptionWebsocketEnabled()) {
-            register(ca.uhn.fhir.jpa.config.WebsocketDispatcherConfig.class);
+            register(WebsocketDispatcherConfig.class);
         }
 
     }

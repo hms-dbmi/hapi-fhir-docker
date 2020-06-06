@@ -28,6 +28,7 @@ public class HapiProperties {
     static final String AUTO_CREATE_PLACEHOLDER_REFERENCE_TARGETS = "auto_create_placeholder_reference_targets";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE = "enforce_referential_integrity_on_write";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_DELETE = "enforce_referential_integrity_on_delete";
+    static final String PERSISTENCE_UNIT_NAME = "persistence_unit_name";
     static final String BINARY_STORAGE_ENABLED = "binary_storage.enabled";
     static final String ALLOW_EXTERNAL_REFERENCES = "allow_external_references";
     static final String ALLOW_MULTIPLE_DELETE = "allow_multiple_delete";
@@ -66,6 +67,15 @@ public class HapiProperties {
     static final String ALLOW_CONTAINS_SEARCHES = "allow_contains_searches";
     static final String ALLOW_OVERRIDE_DEFAULT_SEARCH_PARAMS = "allow_override_default_search_params";
     static final String EMAIL_FROM = "email.from";
+    static final String EMAIL_ENABLED = "email.enabled";
+    static final String EMAIL_HOST = "email.host";
+    static final String EMAIL_PORT = "email.port";
+    static final String EMAIL_USERNAME = "email.username";
+    static final String EMAIL_PASSWORD = "email.password";
+    static final String EMAIL_QUITWAIT = "email.quitwait";
+    static final String EMAIL_STARTTLS_REQUIRED = "email.starttls.required";
+    static final String EMAIL_STARTTLS_ENABLE = "email.starttls.enable";
+    static final String EMAIL_AUTH = "email.auth";
     static final String VALIDATE_REQUESTS_ENABLED = "validation.requests.enabled";
     static final String VALIDATE_RESPONSES_ENABLED = "validation.responses.enabled";
     static final String FILTER_SEARCH_ENABLED = "filter_search.enabled";
@@ -73,7 +83,7 @@ public class HapiProperties {
     static final String BULK_EXPORT_ENABLED = "bulk.export.enabled";
     static final String EXPIRE_SEARCH_RESULTS_AFTER_MINS = "retain_cached_searches_mins";
     static final String MAX_BINARY_SIZE = "max_binary_size";
-    private static Properties properties;
+    private static Properties ourProperties;
 
     public static boolean isElasticSearchEnabled() {
         return HapiProperties.getPropertyBoolean("elasticsearch.enabled", false);
@@ -83,7 +93,7 @@ public class HapiProperties {
      * Force the configuration to be reloaded
      */
     public static void forceReload() {
-        properties = null;
+        ourProperties = null;
         getProperties();
     }
 
@@ -115,12 +125,12 @@ public class HapiProperties {
     }
 
     private static Properties getProperties() {
-        if (properties == null) {
+        if (ourProperties == null) {
             Properties properties = loadProperties();
-            HapiProperties.properties = properties;
+            HapiProperties.ourProperties = properties;
         }
 
-        return properties;
+        return ourProperties;
     }
 
     @NotNull
@@ -144,17 +154,17 @@ public class HapiProperties {
     /**
      * If a configuration file path is explicitly specified via -Dhapi.properties=<path>, the properties there will
      * be used to override the entries in the default hapi.properties file (currently under WEB-INF/classes)
+     *
      * @return properties loaded from the explicitly specified configuraiton file if there is one, or null otherwise.
      */
     private static Properties loadOverrideProperties() {
         String confFile = System.getProperty(HAPI_PROPERTIES);
-        if(confFile != null) {
+        if (confFile != null) {
             try {
                 Properties props = new Properties();
                 props.load(new FileInputStream(confFile));
                 return props;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new ConfigurationException("Could not load HAPI properties file: " + confFile, e);
             }
         }
@@ -181,14 +191,10 @@ public class HapiProperties {
     }
 
     private static String getProperty(String propertyName, String defaultValue) {
-        Properties properties = HapiProperties.getProperties();
+        String value = getProperty(propertyName);
 
-        if (properties != null) {
-            String value = properties.getProperty(propertyName);
-
-            if (value != null && value.length() > 0) {
-                return value;
-            }
+        if (value != null && value.length() > 0) {
+            return value;
         }
 
         return defaultValue;
@@ -202,6 +208,10 @@ public class HapiProperties {
         }
 
         return Boolean.parseBoolean(value);
+    }
+
+    private static boolean getBooleanProperty(String propertyName, boolean defaultValue) {
+        return getBooleanProperty(propertyName, Boolean.valueOf(defaultValue));
     }
 
     private static Integer getIntegerProperty(String propertyName, Integer defaultValue) {
@@ -253,7 +263,7 @@ public class HapiProperties {
     }
 
     public static String getServerAddress() {
-        return System.getenv("FHIR_SERVER_URL");
+        return HapiProperties.getProperty(SERVER_ADDRESS);
     }
 
     public static Integer getDefaultPageSize() {
@@ -285,7 +295,7 @@ public class HapiProperties {
     }
 
     public static String getDataSourceDriver() {
-        return "com.mysql.jdbc.Driver";
+        return HapiProperties.getProperty(DATASOURCE_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     }
 
     public static Integer getDataSourceMaxPoolSize() {
@@ -293,15 +303,15 @@ public class HapiProperties {
     }
 
     public static String getDataSourceUrl() {
-        return System.getenv("FHIR_MYSQL_URL");
+        return HapiProperties.getProperty(DATASOURCE_URL, "jdbc:derby:directory:target/jpaserver_derby_files;create=true");
     }
 
     public static String getDataSourceUsername() {
-        return System.getenv("FHIR_MYSQL_USERNAME");
+        return HapiProperties.getProperty(DATASOURCE_USERNAME);
     }
 
     public static String getDataSourcePassword() {
-        return System.getenv("FHIR_MYSQL_PASSWORD");
+        return HapiProperties.getProperty(DATASOURCE_PASSWORD);
     }
 
     public static Boolean getAllowMultipleDelete() {
@@ -386,37 +396,40 @@ public class HapiProperties {
     }
 
     public static Boolean getEmailEnabled() {
-        return HapiProperties.getBooleanProperty("email.enabled", false);
+        return HapiProperties.getBooleanProperty(EMAIL_ENABLED, false);
     }
 
     public static String getEmailHost() {
-        return HapiProperties.getProperty("email.host");
+        return HapiProperties.getProperty(EMAIL_HOST);
     }
 
     public static Integer getEmailPort() {
-        return HapiProperties.getIntegerProperty("email.port", 0);
+        return HapiProperties.getIntegerProperty(EMAIL_PORT, 0);
     }
 
     public static String getEmailUsername() {
-        return HapiProperties.getProperty("email.username");
+        return HapiProperties.getProperty(EMAIL_USERNAME);
     }
 
     public static String getEmailPassword() {
-        return HapiProperties.getProperty("email.password");
+        return HapiProperties.getProperty(EMAIL_PASSWORD);
     }
 
-    /* These are HAPI-FHIR 5.0.0+ exclusive or something: https://github.com/hapifhir/hapi-fhir-jpaserver-starter/blob/0430a539ff0119446993fdb5906d5ba192b35c3b/src/main/java/ca/uhn/fhir/jpa/starter/FhirServerConfigCommon.java#L200 */
-    public static Boolean getEmailAuth()  {
-        return HapiProperties.getBooleanProperty("email.auth", false);
+    // Defaults from https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
+    public static Boolean getEmailAuth() {
+        return HapiProperties.getBooleanProperty(EMAIL_AUTH, false);
     }
-    public static Boolean getEmailStartTlsEnable()  {
-        return HapiProperties.getBooleanProperty("email.starttls.enable", false);
+
+    public static Boolean getEmailStartTlsEnable() {
+        return HapiProperties.getBooleanProperty(EMAIL_STARTTLS_ENABLE, false);
     }
-    public static Boolean getEmailStartTlsRequired()  {
-        return HapiProperties.getBooleanProperty("email.starttls.required", false);
+
+    public static Boolean getEmailStartTlsRequired() {
+        return HapiProperties.getBooleanProperty(EMAIL_STARTTLS_REQUIRED, false);
     }
-    public static Boolean getEmailQuitWait()  {
-        return HapiProperties.getBooleanProperty("email.quitwait", true);
+
+    public static Boolean getEmailQuitWait() {
+        return HapiProperties.getBooleanProperty(EMAIL_QUITWAIT, true);
     }
 
     public static Long getReuseCachedSearchResultsMillis() {
@@ -483,7 +496,12 @@ public class HapiProperties {
         return HapiProperties.getBooleanProperty(BULK_EXPORT_ENABLED, true);
     }
 
-    public static boolean isFhirPathFilterInterceptorEnabled() {
-        return HapiProperties.getBooleanProperty("fhirpath_interceptor.enabled", false);
+    public static String getPersistenceUnitName() { return getProperty(PERSISTENCE_UNIT_NAME, "HAPI_PU"); }
+
+    public static Boolean getJwtAuthenticationEnabled() {
+        String auth = HapiProperties.getProperty("auth", "open");
+
+        // If set to JWT, then it's enabled
+        return auth.toLowerCase().equals("jwt");
     }
 }

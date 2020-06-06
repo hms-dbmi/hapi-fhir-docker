@@ -1,11 +1,19 @@
 package hms.dbmi.ppm;
 
+import hms.dbmi.ppm.DBMITokenAuthInterceptor;
+import hms.dbmi.ppm.TokenVerifier;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
 import ca.uhn.fhir.to.TesterConfig;
+import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.context.FhirContext;
 
 //@formatter:off
 /**
@@ -44,6 +52,36 @@ public class FhirTesterConfig {
 				.withBaseUrl(HapiProperties.getServerAddress())
 				.withName(HapiProperties.getServerName());
 		retVal.setRefuseToFetchThirdPartyUrls(HapiProperties.getTesterConfigRefustToFetchThirdPartyUrls());
+
+		// Check if JWT authn/authz are enabled
+		if(HapiProperties.getJwtAuthenticationEnabled()) {
+			System.out.println("------------------- JWT AuthN Enabled -------------------");
+
+			// Add a client to take the JWT cookie token and put it into the request headers
+			ITestingUiClientFactory clientFactory = new ITestingUiClientFactory() {
+
+				@Override
+				public IGenericClient newClient(FhirContext theFhirContext, HttpServletRequest theRequest, String theServerBaseUrl) {
+
+					// Create a client
+					IGenericClient client = theFhirContext.newRestfulGenericClient(theServerBaseUrl);
+
+					// Fetch the token
+					String token = TokenVerifier.getTokenFromCookie(theRequest);
+
+					// Ensure it's not null
+					if( token != null) {
+
+						// Register an interceptor which adds the token as credentials
+						client.registerInterceptor(new DBMITokenAuthInterceptor(token));
+					}
+
+					return client;
+				}
+			};
+			retVal.setClientFactory(clientFactory);
+		}
+
 		return retVal;
 	}
 

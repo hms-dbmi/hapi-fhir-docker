@@ -6,11 +6,7 @@ import hms.dbmi.ppm.MyLoggingInterceptor;
 
 import ca.uhn.fhir.jpa.binstore.DatabaseBlobBinaryStorageSvcImpl;
 import ca.uhn.fhir.jpa.binstore.IBinaryStorageSvc;
-import ca.uhn.fhir.jpa.dao.DaoConfig;
 import ca.uhn.fhir.jpa.model.entity.ModelConfig;
-import ca.uhn.fhir.jpa.subscription.module.channel.SubscriptionDeliveryHandlerFactory;
-import ca.uhn.fhir.jpa.subscription.module.subscriber.email.IEmailSender;
-import ca.uhn.fhir.jpa.subscription.module.subscriber.email.JavaMailEmailSender;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hl7.fhir.dstu2.model.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +26,19 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Driver;
+
+//#if hapi_fhir_version=="5.0.0"
+import ca.uhn.fhir.jpa.api.config.DaoConfig;
+import ca.uhn.fhir.jpa.model.config.PartitionSettings;
+import ca.uhn.fhir.jpa.subscription.channel.subscription.SubscriptionDeliveryHandlerFactory;
+import ca.uhn.fhir.jpa.subscription.match.deliver.email.IEmailSender;
+import ca.uhn.fhir.jpa.subscription.match.deliver.email.JavaMailEmailSender;
+//#else
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
+//$import ca.uhn.fhir.jpa.subscription.module.channel.SubscriptionDeliveryHandlerFactory;
+//$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.IEmailSender;
+//$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.JavaMailEmailSender;
+//#endif
 
 /**
  * This is the primary configuration file for the example server
@@ -67,8 +76,13 @@ public class FhirServerConfigCommon {
     private Boolean emailStartTlsRequired = HapiProperties.getEmailStartTlsRequired();
     private Boolean emailQuitWait = HapiProperties.getEmailQuitWait();
 
+    //#if hapi_fhir_version=="5.0.0"
     @Autowired
-    private SubscriptionDeliveryHandlerFactory mySubscriptionDeliveryHandlerFactory;
+    private ApplicationContext myAppCtx;
+    //#else
+    @Autowired
+    private SubscriptionDeliveryHandlerFactory subscriptionDeliveryHandlerFactory;
+    //#endif
 
     public FhirServerConfigCommon() {
         ourLog.info("Server configured to " + (this.allowContainsSearches ? "allow" : "deny") + " contains searches");
@@ -107,10 +121,10 @@ public class FhirServerConfigCommon {
     public DaoConfig daoConfig() {
         DaoConfig retVal = new DaoConfig();
 
+        retVal.setIndexMissingFields(this.enableIndexMissingFields ? DaoConfig.IndexEnabledEnum.ENABLED : DaoConfig.IndexEnabledEnum.DISABLED);
         retVal.setAutoCreatePlaceholderReferenceTargets(this.autoCreatePlaceholderReferenceTargets);
         retVal.setEnforceReferentialIntegrityOnWrite(this.enforceReferentialIntegrityOnWrite);
         retVal.setEnforceReferentialIntegrityOnDelete(this.enforceReferentialIntegrityOnDelete);
-        retVal.setAllowContainsSearches(this.allowContainsSearches);
         retVal.setAllowContainsSearches(this.allowContainsSearches);
         retVal.setAllowMultipleDelete(this.allowMultipleDelete);
         retVal.setAllowExternalReferences(this.allowExternalReferences);
@@ -125,9 +139,9 @@ public class FhirServerConfigCommon {
         Long reuseCachedSearchResultsMillis = HapiProperties.getReuseCachedSearchResultsMillis();
         retVal.setReuseCachedSearchResultsForMillis(reuseCachedSearchResultsMillis);
         ourLog.info("Server configured to cache search results for {} milliseconds", reuseCachedSearchResultsMillis);
+
         Long retainCachedSearchesMinutes = HapiProperties.getExpireSearchResultsAfterMins();
         retVal.setExpireSearchResultsAfterMillis(retainCachedSearchesMinutes * 60 * 1000);
-        ourLog.info("Server configured to expire search results after {} milliseconds", retainCachedSearchesMinutes);
 
         // Subscriptions are enabled by channel type
         if (HapiProperties.getSubscriptionRestHookEnabled()) {
@@ -142,6 +156,8 @@ public class FhirServerConfigCommon {
             ourLog.info("Enabling websocket subscriptions");
             retVal.addSupportedSubscriptionType(Subscription.SubscriptionChannelType.WEBSOCKET);
         }
+
+        retVal.setFilterParameterEnabled(HapiProperties.getFilterSearchEnabled());
 
         return retVal;
     }
@@ -196,6 +212,13 @@ public class FhirServerConfigCommon {
         return binaryStorageSvc;
     }
 
+    //#if hapi_fhir_version=="5.0.0"
+    @Bean
+    public PartitionSettings partitionSettings() {
+        return new PartitionSettings();
+    }
+    //#endif
+
     @Bean()
     public IEmailSender emailSender() {
         if (this.emailEnabled) {
@@ -205,16 +228,15 @@ public class FhirServerConfigCommon {
             retVal.setSmtpServerPort(this.emailPort);
             retVal.setSmtpServerUsername(this.emailUsername);
             retVal.setSmtpServerPassword(this.emailPassword);
-            /* These are specific to HAPI-FHIR versions above 4.2.0
-            https://github.com/hapifhir/hapi-fhir-jpaserver-starter/blob/0430a539ff0119446993fdb5906d5ba192b35c3b/src/main/java/ca/uhn/fhir/jpa/starter/FhirServerConfigCommon.java#L200
-            */
-            /*
-            retVal.setAuth(this.emailAuth);
-            retVal.setStartTlsEnable(this.emailStartTlsEnable);
-            retVal.setStartTlsRequired(this.emailStartTlsRequired);
-            retVal.setQuitWait(this.emailQuitWait);
-            */
-            SubscriptionDeliveryHandlerFactory subscriptionDeliveryHandlerFactory = appContext.getBean(SubscriptionDeliveryHandlerFactory.class);
+            // TODO KHS add these when HAPI 4.2.0 is released
+            //retVal.setAuth(this.emailAuth);
+            //retVal.setStartTlsEnable(this.emailStartTlsEnable);
+            //retVal.setStartTlsRequired(this.emailStartTlsRequired);
+            //retVal.setQuitWait(this.emailQuitWait);
+
+            //#if hapi_fhir_version=="5.0.0"
+            SubscriptionDeliveryHandlerFactory subscriptionDeliveryHandlerFactory = myAppCtx.getBean(SubscriptionDeliveryHandlerFactory.class);
+            //#endif
             Validate.notNull(subscriptionDeliveryHandlerFactory, "No subscription delivery handler");
             subscriptionDeliveryHandlerFactory.setEmailSender(retVal);
 

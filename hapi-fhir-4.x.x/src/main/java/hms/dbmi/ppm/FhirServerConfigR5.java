@@ -35,7 +35,7 @@ public class FhirServerConfigR5 extends BaseJavaConfigR5 {
     @Bean()
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean retVal = super.entityManagerFactory();
-        retVal.setPersistenceUnitName("HAPI_PU");
+        retVal.setPersistenceUnitName(HapiProperties.getPersistenceUnitName());
 
         try {
             retVal.setDataSource(myDataSource);
