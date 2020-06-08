@@ -1,40 +1,63 @@
 FROM maven:3.5-jdk-8-alpine AS builder
 
 # Set the HAPI-FHIR project to install
-ARG HAPI_FHIR_SRC=hapi-fhir-3.x.x
+ARG HAPI_FHIR_SRC=common
 
 # Set the version of the build
 ARG DBMI_HAPI_FHIR_VERSION
 ENV DBMI_HAPI_FHIR_VERSION=${DBMI_HAPI_FHIR_VERSION}
 
-# Set the version of HAPI-FHIR to use
-ARG HAPI_FHIR_VERSION=3.6.0
-ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
+# Set the version of HAPI-FHIR to use. Versions are broken out into
+# parts to enable easier comparison in the preprocessing to manage
+# minor differences between HAPI-FHIR versions.
+ARG HAPI_FHIR_VERSION_MAJOR=5
+ENV HAPI_FHIR_VERSION_MAJOR=${HAPI_FHIR_VERSION_MAJOR}
+ARG HAPI_FHIR_VERSION_MINOR=0
+ENV HAPI_FHIR_VERSION_MINOR=${HAPI_FHIR_VERSION_MINOR}
+ARG HAPI_FHIR_VERSION_PATCH=0
+ENV HAPI_FHIR_VERSION_PATCH=${HAPI_FHIR_VERSION_PATCH}
+ARG HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
+ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
 
 # Enable the overlay by defining this argument
 ARG HAPI_FHIR_PROFILE=default
 
-# Enable or disable JWT
-ARG JWT_AUTH_ENABLED=true
-ENV JWT_AUTH_ENABLED=${JWT_AUTH_ENABLED}
+# Set the version of HAPI-FHIR to use
+ARG FHIR_VERSION=R5
+ENV FHIR_VERSION=${FHIR_VERSION}
+
+# Set the webroot for the FHIR server
+ARG FHIR_ROOT=fhir
+ENV FHIR_ROOT=${FHIR_ROOT}
 
 # Fetch HAPI-FHIR source and build the app
 WORKDIR /usr/src/app/fhir-server
 
 # Add the POM
-COPY ${HAPI_FHIR_SRC}/pom.xml /usr/src/app/fhir-server/
-COPY ${HAPI_FHIR_SRC}/settings.xml /usr/src/app/fhir-server/
+COPY pom.xml /usr/src/app/fhir-server/
+COPY settings.xml /usr/src/app/fhir-server/
 
 # Bring down packages first and cache them and save millions of minutes
 RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION}
+    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION} -P ${FHIR_VERSION}
 
 # Copy our own source files over next
 COPY ${HAPI_FHIR_SRC} /usr/src/app/fhir-server
 
+# Copy templates
+RUN apk -Uuv add \
+    python3 \
+    py3-pip \
+    && pip3 install shinto-cli \
+    && rm -rf /var/cache/apk/*
+
+# Template the properties file to customize various aspects of the web server
+ADD docker-entrypoint-templates.d/ /docker-entrypoint-templates.d/
+RUN j2 /docker-entrypoint-templates.d/hapi.properties.j2 > /usr/src/app/fhir-server/src/main/resources/hapi.properties
+
 # Build the final WAR
 RUN mvn package -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION}
+    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION} -P ${FHIR_VERSION}
 
 FROM tomcat:8-alpine
 

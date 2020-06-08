@@ -1,16 +1,18 @@
 version: '2.3'
 services:
   fhir-server:
-    image: hmsdbmitc/ppm-fhir:${HAPI_FHIR_VERSION}
+    image: hmsdbmitc/ppm-fhir:${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
     build:
       context: .
       args:
-        - HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION}
         - DBMI_HAPI_FHIR_VERSION=${DBMI_HAPI_FHIR_VERSION}
-        - HAPI_FHIR_PROFILE=${OVERLAY_PROFILE}
+        - HAPI_FHIR_VERSION_MAJOR=${HAPI_FHIR_VERSION_MAJOR}
+        - HAPI_FHIR_VERSION_MINOR=${HAPI_FHIR_VERSION_MINOR}
+        - HAPI_FHIR_VERSION_PATCH=${HAPI_FHIR_VERSION_PATCH}
+        - HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
         - HAPI_FHIR_SRC=${HAPI_FHIR_SRC}
         - FHIR_VERSION=${FHIR_VERSION}
-        - AUTH_PROFILE=${AUTH_PROFILE}
+        - FHIR_ROOT=${FHIR_ROOT}
     environment:
       DBMI_SSL:
       DBMI_LB:
@@ -23,10 +25,6 @@ services:
       FHIR_MYSQL_URL: "jdbc:mysql://fhir-database:3306/${HAPI_FHIR_MYSQL_DATABASE}"
       FHIR_MYSQL_USERNAME: ${HAPI_FHIR_MYSQL_USERNAME}
       FHIR_MYSQL_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
-      HAPI_DATASOURCE_DRIVER: "com.mysql.jdbc.Driver"
-      HAPI_DATASOURCE_URL: "jdbc:mysql://fhir-database:3306/${HAPI_FHIR_MYSQL_DATABASE}"
-      HAPI_DATASOURCE_USERNAME: ${HAPI_FHIR_MYSQL_USERNAME}
-      HAPI_DATASOURCE_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
       JWT_ISSUER: https://dbmiauth-local.auth0.com/
       JWT_AUDIENCE: riTKsD6l6tAC5hIcSzF7DFZ1VRh32sqf
       JWT_COOKIE_NAME: DBMI_JWT
@@ -34,15 +32,27 @@ services:
       JWT_AUTHZ_CLAIM: "http://local.authorization.dbmi.hms.harvard.edu"
       JWT_ADMIN_GROUP: "ppm-admin"
       JWT_AUTH_ENABLED: "false"
-      AUTH_PROFILE: ${AUTH_PROFILE}
       SENTRY_DSN:
       DBMI_APP_HEALTHCHECK_PATH: /${FHIR_ROOT}/metadata
       FHIR_SERVER_URL: http://localhost:${PORT}/${FHIR_ROOT}
+      TOKEN_HEADER_PREFIX: "Token "
+      AUTHORIZED_TOKENS: abc123abc123,abcdefghijklmnopqrstuvwxyz
+
+      # These are found by HapiProperties.class and used to override set values
+      # in hapi.properties
+      HAPI_DATASOURCE_DRIVER: "com.mysql.jdbc.Driver"
+      HAPI_DATASOURCE_URL: "jdbc:mysql://fhir-database:3306/${HAPI_FHIR_MYSQL_DATABASE}"
+      HAPI_DATASOURCE_USERNAME: ${HAPI_FHIR_MYSQL_USERNAME}
+      HAPI_DATASOURCE_PASSWORD: ${HAPI_FHIR_MYSQL_PASSWORD}
       HAPI_SERVER_ADDRESS: http://localhost:${PORT}/${FHIR_ROOT}
+      HAPI_AUTH: token
+
     ports:
       - ${PORT}:${PORT}
+      - 8083:8443
+      - 8081:8080
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:${PORT}/healthcheck || exit 1"]
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:${PORT}/${FHIR_ROOT}/metadata || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10

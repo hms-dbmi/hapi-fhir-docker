@@ -2,12 +2,9 @@ package hms.dbmi.ppm;
 
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirVersionEnum;
-import ca.uhn.fhir.jpa.search.elastic.ElasticsearchHibernatePropertiesBuilder;
 import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.server.ETagSupportEnum;
 import com.google.common.annotations.VisibleForTesting;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -24,12 +21,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 public class HapiProperties {
+    static final String AUTH = "auth";
     static final String ENABLE_INDEX_MISSING_FIELDS = "enable_index_missing_fields";
     static final String AUTO_CREATE_PLACEHOLDER_REFERENCE_TARGETS = "auto_create_placeholder_reference_targets";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE = "enforce_referential_integrity_on_write";
     static final String ENFORCE_REFERENTIAL_INTEGRITY_ON_DELETE = "enforce_referential_integrity_on_delete";
-    static final String PERSISTENCE_UNIT_NAME = "persistence_unit_name";
     static final String BINARY_STORAGE_ENABLED = "binary_storage.enabled";
+    static final String PERSISTENCE_UNIT_NAME = "persistence_unit_name";
     static final String ALLOW_EXTERNAL_REFERENCES = "allow_external_references";
     static final String ALLOW_MULTIPLE_DELETE = "allow_multiple_delete";
     static final String ALLOW_PLACEHOLDER_REFERENCES = "allow_placeholder_references";
@@ -108,18 +106,6 @@ public class HapiProperties {
 
     public static Properties getJpaProperties() {
         Properties retVal = loadProperties();
-
-        if (isElasticSearchEnabled()) {
-            ElasticsearchHibernatePropertiesBuilder builder = new ElasticsearchHibernatePropertiesBuilder();
-            builder.setRequiredIndexStatus(getPropertyEnum("elasticsearch.required_index_status", ElasticsearchIndexStatus.class, ElasticsearchIndexStatus.YELLOW));
-            builder.setRestUrl(getProperty("elasticsearch.rest_url"));
-            builder.setUsername(getProperty("elasticsearch.username"));
-            builder.setPassword(getProperty("elasticsearch.password"));
-            builder.setIndexSchemaManagementStrategy(getPropertyEnum("elasticsearch.schema_management_strategy", IndexSchemaManagementStrategy.class, IndexSchemaManagementStrategy.CREATE));
-            builder.setDebugRefreshAfterWrite(getPropertyBoolean("elasticsearch.debug.refresh_after_write", false));
-            builder.setDebugPrettyPrintJsonLog(getPropertyBoolean("elasticsearch.debug.pretty_print_json_log", false));
-            builder.apply(retVal);
-        }
 
         return retVal;
     }
@@ -498,10 +484,17 @@ public class HapiProperties {
 
     public static String getPersistenceUnitName() { return getProperty(PERSISTENCE_UNIT_NAME, "HAPI_PU"); }
 
-    public static Boolean getJwtAuthenticationEnabled() {
+    public static Boolean getJwtAuthEnabled() {
         String auth = HapiProperties.getProperty("auth", "open");
 
         // If set to JWT, then it's enabled
-        return auth.toLowerCase().equals("jwt");
+        return auth.toLowerCase().contains("jwt");
+    }
+
+    public static Boolean getTokenAuthEnabled() {
+        String auth = HapiProperties.getProperty("auth", "open");
+
+        // If set to JWT, then it's enabled
+        return auth.toLowerCase().contains("token");
     }
 }

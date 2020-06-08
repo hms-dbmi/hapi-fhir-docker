@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+	<div th:fragment="banner" class="well">
+		<th:block th:if="${serverId} == 'home'">
+			<p>
+				This server (and the testing application you are currently using to access it)
+				is entirely built using
+				<a href="https://github.com/jamesagnew/hapi-fhir">HAPI-FHIR</a>,
+				a 100% open-source Java implementation of the
+				<a href="http://hl7.org/implement/standards/fhir/">FHIR specification</a>.
+			</p>
+		</th:block>
+	</div>
+</html>
