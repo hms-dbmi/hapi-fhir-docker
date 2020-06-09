@@ -2,10 +2,15 @@ package hms.dbmi.ppm;
 
 import org.apache.commons.lang3.Validate;
 
-import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.client.api.*;
 import ca.uhn.fhir.util.CoverageIgnore;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+
+//#if gte_3_0_0
+import ca.uhn.fhir.rest.api.Constants;
+//#else
+//$import ca.uhn.fhir.rest.server.Constants;
+//#endif
 
 
 /**

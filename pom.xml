@@ -19,6 +19,7 @@
 	</repositories>
 
 	<properties>
+		<hapi-fhir-version>${env.HAPI_FHIR_VERSION}</hapi-fhir-version>
 		<spring-version>5.2.3.RELEASE</spring-version>
 		<spring-boot-data-version>2.2.6.RELEASE</spring-boot-data-version>
 		<thymeleaf-version>3.0.11.RELEASE</thymeleaf-version>
@@ -98,6 +99,24 @@
 		</profile>
 
 		<!-- These profiles determine the version of HAPI-FHIR to build -->
+		<profile>
+			<id>2.5.0</id>
+			<properties>
+				<hapi-fhir-version>2.5</hapi-fhir-version>
+				<spring-version>4.3.7.RELEASE</spring-version>
+				<spring-boot-data-version>2.0.1.RELEASE</spring-boot-data-version>
+				<thymeleaf-version>3.0.2.RELEASE</thymeleaf-version>
+			</properties>
+		</profile>
+		<profile>
+			<id>2.4.0</id>
+			<properties>
+				<hapi-fhir-version>2.4</hapi-fhir-version>
+				<spring-version>4.3.7.RELEASE</spring-version>
+				<spring-boot-data-version>2.0.1.RELEASE</spring-boot-data-version>
+				<thymeleaf-version>3.0.2.RELEASE</thymeleaf-version>
+			</properties>
+		</profile>
 		<profile>
 			<id>3.6.0</id>
 			<properties>
@@ -242,14 +261,14 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
-			<version>${env.HAPI_FHIR_VERSION}</version>
+			<version>${hapi-fhir-version}</version>
 		</dependency>
 
 		<!-- This dependency includes the JPA server itself, which is packaged separately from the rest of HAPI FHIR -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-jpaserver-base</artifactId>
-			<version>${env.HAPI_FHIR_VERSION}</version>
+			<version>${hapi-fhir-version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -266,14 +285,14 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-testpage-overlay</artifactId>
-			<version>${env.HAPI_FHIR_VERSION}</version>
+			<version>${hapi-fhir-version}</version>
 			<type>war</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-testpage-overlay</artifactId>
-			<version>${env.HAPI_FHIR_VERSION}</version>
+			<version>${hapi-fhir-version}</version>
 			<classifier>classes</classifier>
 			<scope>provided</scope>
 		</dependency>

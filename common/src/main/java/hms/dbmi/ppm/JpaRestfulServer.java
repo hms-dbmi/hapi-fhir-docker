@@ -25,8 +25,6 @@ import ca.uhn.fhir.jpa.provider.JpaConformanceProviderDstu2;
 import ca.uhn.fhir.jpa.provider.JpaSystemProviderDstu2;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaSystemProviderDstu3;
-import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
-import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.model.dstu2.composite.MetaDt;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -42,7 +40,6 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import java.util.HashSet;
 import java.util.TreeSet;
 import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.dstu3.model.Meta;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -73,6 +70,9 @@ import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.interceptor.api.IInterceptorService;
 import ca.uhn.fhir.jpa.api.rp.ResourceProviderFactory;
 import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
+import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
+import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
 //#endif
 
 //#if eq_4
@@ -93,11 +93,17 @@ import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 //$import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 //$import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
 //$import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
+//$import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
+//$import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
+//$import org.hl7.fhir.r4.model.Bundle.BundleType;
 //#endif
 
 //#if eq_3
 //$import ca.uhn.fhir.jpa.dao.DaoConfig;
 //$import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
+//$import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
+//$import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
+//$import org.hl7.fhir.r4.model.Bundle.BundleType;
 
 //#if gte_3_8_0
 //$import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
@@ -122,7 +128,6 @@ import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 //#if eq_2
 //$import ca.uhn.fhir.jpa.dao.DaoConfig;
 //$import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
-//$import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
 //$import java.util.List;
 //$import ca.uhn.fhir.rest.server.IResourceProvider;
 //#endif
@@ -142,13 +147,14 @@ public class JpaRestfulServer extends RestfulServer {
          */
         ApplicationContext appCtx = (ApplicationContext) getServletContext()
                 .getAttribute("org.springframework.web.context.WebApplicationContext.ROOT");
+        //#if gte_3_0_0
         // Customize supported resource types
         Set<String> supportedResourceTypes = HapiProperties.getSupportedResourceTypes();
 
         if (!supportedResourceTypes.isEmpty() && !supportedResourceTypes.contains("SearchParameter")) {
             supportedResourceTypes.add("SearchParameter");
         }
-
+        //#endif
         //#if gte_4_0_0
         if (!supportedResourceTypes.isEmpty()) {
             DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
@@ -180,6 +186,7 @@ public class JpaRestfulServer extends RestfulServer {
             //$resourceProviders = appCtx.getBean("myResourceProvidersDstu3", List.class);
             //#endif
             systemProvider = appCtx.getBean("mySystemProviderDstu3", JpaSystemProviderDstu3.class);
+        //#if gte_3_0_0
         } else if (fhirVersion == FhirVersionEnum.R4) {
             //#if gte_3_8_0
             resourceProviders = appCtx.getBean("myResourceProvidersR4", ResourceProviderFactory.class);
@@ -187,6 +194,7 @@ public class JpaRestfulServer extends RestfulServer {
             //$resourceProviders = appCtx.getBean("myResourceProvidersR4", List.class);
             //#endif
             systemProvider = appCtx.getBean("mySystemProviderR4", JpaSystemProviderR4.class);
+        //#endif
         //#if hapi_fhir_version_major >=4
         } else if (fhirVersion == FhirVersionEnum.R5) {
             resourceProviders = appCtx.getBean("myResourceProvidersR5", ResourceProviderFactory.class);
@@ -234,6 +242,7 @@ public class JpaRestfulServer extends RestfulServer {
             //#endif
             confProvider.setImplementationDescription("HAPI FHIR DSTU3 Server");
             setServerConformanceProvider(confProvider);
+        //#if gte_3_0_0
         } else if (fhirVersion == FhirVersionEnum.R4) {
             IFhirSystemDao<org.hl7.fhir.r4.model.Bundle, org.hl7.fhir.r4.model.Meta> systemDao = appCtx
                     .getBean("mySystemDaoR4", IFhirSystemDao.class);
@@ -244,6 +253,7 @@ public class JpaRestfulServer extends RestfulServer {
             //#endif
             confProvider.setImplementationDescription("HAPI FHIR R4 Server");
             setServerConformanceProvider(confProvider);
+        //#endif
         //#if hapi_fhir_version_major >=4
         } else if (fhirVersion == FhirVersionEnum.R5) {
             IFhirSystemDao<org.hl7.fhir.r5.model.Bundle, org.hl7.fhir.r5.model.Meta> systemDao = appCtx

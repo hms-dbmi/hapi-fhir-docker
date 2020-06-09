@@ -1,5 +1,7 @@
 package hms.dbmi.ppm;
 
+//#define gte_3_0_0 hapi_fhir_version_major>=3
+
 import java.util.*;
 import org.apache.commons.lang3.Validate;
 
@@ -11,9 +13,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import ca.uhn.fhir.rest.server.interceptor.InterceptorAdapter;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 
+//#if gte_3_0_0
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+//#else
+//$import ca.uhn.fhir.rest.method.RequestDetails;
+//#endif
 
 public class TokenAuthenticationInterceptor extends InterceptorAdapter {
 

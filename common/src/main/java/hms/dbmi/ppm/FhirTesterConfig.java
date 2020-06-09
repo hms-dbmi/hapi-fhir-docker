@@ -11,9 +11,15 @@ import org.springframework.context.annotation.Import;
 
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
 import ca.uhn.fhir.to.TesterConfig;
+import ca.uhn.fhir.context.FhirContext;
+
+//#if gte_3_0_0
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.context.FhirContext;
+//#else
+//$import ca.uhn.fhir.util.ITestingUiClientFactory;
+//$import ca.uhn.fhir.rest.client.IGenericClient;
+//#endif
 
 //@formatter:off
 /**
@@ -51,8 +57,9 @@ public class FhirTesterConfig {
 				.withFhirVersion(HapiProperties.getFhirVersion())
 				.withBaseUrl(HapiProperties.getServerAddress())
 				.withName(HapiProperties.getServerName());
+		//#if gte_3_0_0
 		retVal.setRefuseToFetchThirdPartyUrls(HapiProperties.getTesterConfigRefustToFetchThirdPartyUrls());
-
+		//#endif
 		// Check if JWT authn/authz are enabled
 		if(HapiProperties.getJwtAuthEnabled()) {
 			System.out.println("------------------- JWT AuthN Enabled -------------------");

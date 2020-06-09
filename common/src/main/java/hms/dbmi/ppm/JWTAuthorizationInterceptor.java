@@ -1,5 +1,8 @@
 package hms.dbmi.ppm;
 
+//#define gte_3_7_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=7 )
+//#define gte_3_0_0 hapi_fhir_version_major>=3
+
 import hms.dbmi.ppm.TokenVerifier;
 import hms.dbmi.ppm.DBMITokenAuthInterceptor;
 
@@ -20,16 +23,22 @@ import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Flag;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 import ca.uhn.fhir.jpa.rp.dstu3.PatientResourceProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
 
-//#if hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=7 )
+//#if gte_3_7_0
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 //#else
 //$import ca.uhn.fhir.jpa.dao.SearchParameterMap;
+//#endif
+
+//#if gte_3_0_0
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
+//#else
+//$import ca.uhn.fhir.rest.method.RequestDetails;
+//$import ca.uhn.fhir.rest.server.IBundleProvider;
 //#endif
 
 @SuppressWarnings("ConstantConditions")

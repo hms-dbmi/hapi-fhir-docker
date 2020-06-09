@@ -4,12 +4,10 @@ package hms.dbmi.ppm;
 
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirVersionEnum;
-import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.server.ETagSupportEnum;
 import com.google.common.annotations.VisibleForTesting;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -21,6 +19,13 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trim;
+
+//#if gte_3_0_0
+import javax.annotation.Nonnull;
+import ca.uhn.fhir.rest.api.EncodingEnum;
+//#else
+//$import ca.uhn.fhir.rest.server.EncodingEnum;
+//#endif
 
 public class HapiProperties {
     static final String AUTH = "auth";
@@ -343,6 +348,7 @@ public class HapiProperties {
         return HapiProperties.getProperty(ALLOWED_BUNDLE_TYPES, "");
     }
 
+    //#if gte_3_0_0
     @Nonnull
     public static Set<String> getSupportedResourceTypes() {
         String[] types = defaultString(getProperty("supported_resource_types")).split(",");
@@ -351,6 +357,7 @@ public class HapiProperties {
                 .filter(t -> isNotBlank(t))
                 .collect(Collectors.toSet());
     }
+    //#endif
 
     public static String getServerName() {
         return HapiProperties.getProperty(SERVER_NAME, "Local Tester");

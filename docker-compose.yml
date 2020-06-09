@@ -10,6 +10,7 @@ services:
         - HAPI_FHIR_VERSION_MINOR=${HAPI_FHIR_VERSION_MINOR}
         - HAPI_FHIR_VERSION_PATCH=${HAPI_FHIR_VERSION_PATCH}
         - HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
+        - HAPI_FHIR_PROFILE=${OVERLAY_PROFILE}
         - HAPI_FHIR_SRC=${HAPI_FHIR_SRC}
         - FHIR_VERSION=${FHIR_VERSION}
         - FHIR_ROOT=${FHIR_ROOT}
@@ -35,7 +36,7 @@ services:
       SENTRY_DSN:
       DBMI_APP_HEALTHCHECK_PATH: /${FHIR_ROOT}/metadata
       FHIR_SERVER_URL: http://localhost:${PORT}/${FHIR_ROOT}
-      TOKEN_HEADER_PREFIX: "Token "
+      TOKEN_HEADER_PREFIX: "Bearer "
       AUTHORIZED_TOKENS: abc123abc123,abcdefghijklmnopqrstuvwxyz
 
       # These are found by HapiProperties.class and used to override set values

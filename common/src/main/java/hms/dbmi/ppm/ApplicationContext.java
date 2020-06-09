@@ -33,10 +33,6 @@ import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 //$import ca.uhn.fhir.jpa.config.WebsocketDispatcherConfig;
 //#endif
 
-//#if eq_2
-//$import ca.uhn.fhir.jpa.config.WebsocketDispatcherConfig;
-//#endif
-
 public class ApplicationContext extends AnnotationConfigWebApplicationContext {
 
     public ApplicationContext() {
@@ -45,8 +41,10 @@ public class ApplicationContext extends AnnotationConfigWebApplicationContext {
             register(FhirServerConfigDstu2.class, FhirServerConfigCommon.class);
         } else if (fhirVersion == FhirVersionEnum.DSTU3) {
             register(FhirServerConfigDstu3.class, FhirServerConfigCommon.class);
+        //#if gte_3_0_0
         } else if (fhirVersion == FhirVersionEnum.R4) {
             register(FhirServerConfigR4.class, FhirServerConfigCommon.class);
+        //#endif
         //#if gte_4_0_0
         } else if (fhirVersion == FhirVersionEnum.R5) {
             register(FhirServerConfigR5.class, FhirServerConfigCommon.class);
@@ -55,10 +53,11 @@ public class ApplicationContext extends AnnotationConfigWebApplicationContext {
             throw new IllegalStateException();
         }
 
+        //#if gte_3_0_0
         if (HapiProperties.getSubscriptionWebsocketEnabled()) {
             register(WebsocketDispatcherConfig.class);
         }
-
+        //#endif
     }
 
 }

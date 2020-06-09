@@ -1,5 +1,7 @@
 package hms.dbmi.ppm;
 
+//#define gte_3_0_0 hapi_fhir_version_major>=3
+
 import java.util.*;
 import org.apache.commons.lang3.Validate;
 
@@ -18,12 +20,17 @@ import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Flag;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 import ca.uhn.fhir.jpa.rp.dstu3.PatientResourceProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
 
+//#if gte_3_0_0
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
+//#else
+//$import ca.uhn.fhir.rest.method.RequestDetails;
+//$import ca.uhn.fhir.rest.server.IBundleProvider;
+//#endif
 
 @SuppressWarnings("ConstantConditions")
 public class TokenAuthorizationInterceptor extends AuthorizationInterceptor {

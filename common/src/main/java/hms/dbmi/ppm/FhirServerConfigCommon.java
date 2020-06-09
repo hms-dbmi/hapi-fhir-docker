@@ -23,6 +23,7 @@ package hms.dbmi.ppm;
 //#define lt_3_4_0 !gte_3_4_0
 //#define gte_3_3_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=3 )
 //#define lt_3_3_0 !gte_3_3_0
+//#define gte_2_5 hapi_fhir_version_major>=3 || ( hapi_fhir_version_major==2 && hapi_fhir_version_minor>=5 )
 
 import hms.dbmi.ppm.JWTAuthenticationInterceptor;
 import hms.dbmi.ppm.JWTAuthorizationInterceptor;
@@ -169,12 +170,6 @@ public class FhirServerConfigCommon {
     @Bean()
     public DaoConfig daoConfig() {
         DaoConfig retVal = new DaoConfig();
-
-        retVal.setIndexMissingFields(this.enableIndexMissingFields ? DaoConfig.IndexEnabledEnum.ENABLED : DaoConfig.IndexEnabledEnum.DISABLED);
-        retVal.setAutoCreatePlaceholderReferenceTargets(this.autoCreatePlaceholderReferenceTargets);
-        retVal.setEnforceReferentialIntegrityOnWrite(this.enforceReferentialIntegrityOnWrite);
-        retVal.setEnforceReferentialIntegrityOnDelete(this.enforceReferentialIntegrityOnDelete);
-        retVal.setAutoCreatePlaceholderReferenceTargets(this.allowPlaceholderReferences);
         retVal.setAllowExternalReferences(this.allowExternalReferences);
         retVal.setAllowMultipleDelete(this.allowMultipleDelete);
         //#if gte_3_3_0
@@ -186,13 +181,23 @@ public class FhirServerConfigCommon {
         //#if gte_3_7_0
         retVal.setEmailFromAddress(this.emailFrom);
         //#endif
+        //#if gte_3_0_0
+        retVal.setAutoCreatePlaceholderReferenceTargets(this.allowPlaceholderReferences);
+        retVal.setAutoCreatePlaceholderReferenceTargets(this.autoCreatePlaceholderReferenceTargets);
+        retVal.setEnforceReferentialIntegrityOnWrite(this.enforceReferentialIntegrityOnWrite);
+        retVal.setEnforceReferentialIntegrityOnDelete(this.enforceReferentialIntegrityOnDelete);
+        retVal.setIndexMissingFields(this.enableIndexMissingFields ? DaoConfig.IndexEnabledEnum.ENABLED : DaoConfig.IndexEnabledEnum.DISABLED);
+
         Integer maxFetchSize = HapiProperties.getMaximumFetchSize();
         retVal.setFetchSizeDefaultMaximum(maxFetchSize);
         ourLog.info("Server configured to have a maximum fetch size of " + (maxFetchSize == Integer.MAX_VALUE ? "'unlimited'" : maxFetchSize));
+        //#endif
 
+        //#if gte_2_5
         Long reuseCachedSearchResultsMillis = HapiProperties.getReuseCachedSearchResultsMillis();
         retVal.setReuseCachedSearchResultsForMillis(reuseCachedSearchResultsMillis);
         ourLog.info("Server configured to cache search results for {} milliseconds", reuseCachedSearchResultsMillis);
+        //#endif
 
         Long retainCachedSearchesMinutes = HapiProperties.getExpireSearchResultsAfterMins();
         retVal.setExpireSearchResultsAfterMillis(retainCachedSearchesMinutes * 60 * 1000);
