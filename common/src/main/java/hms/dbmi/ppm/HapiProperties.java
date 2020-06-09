@@ -1,5 +1,7 @@
 package hms.dbmi.ppm;
 
+//#define lte_3_1_0 hapi_fhir_version_major<=2 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor<=1 )
+
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.api.EncodingEnum;
@@ -134,6 +136,11 @@ public class HapiProperties {
         if (overrideProps != null) {
             properties.putAll(overrideProps);
         }
+
+        // If we're on HAPI-FHIR <= 3.1.0, remove hibernate.search.model_mapping property
+        //#if lte_3_1_0
+        //$properties.remove("hibernate.search.model_mapping");
+        //#endif
         return properties;
     }
 

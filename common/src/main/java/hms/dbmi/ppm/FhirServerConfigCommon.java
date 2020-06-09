@@ -1,14 +1,34 @@
 package hms.dbmi.ppm;
+//#define gte_5_0_0 hapi_fhir_version_major>=5
+//#define lt_5_0_0 hapi_fhir_version_major<5
+//#define gte_4_0_0 hapi_fhir_version_major>=4
+//#define lt_4_0_0 hapi_fhir_version_major<4
+//#define gte_3_0_0 hapi_fhir_version_major>=3
+//#define lt_3_0_0 hapi_fhir_version_major<3
+//#define gte_2_0_0 hapi_fhir_version_major>=2
+//#define lt_2_0_0 hapi_fhir_version_major<2
+
+//#define eq_5 hapi_fhir_version_major==5
+//#define eq_4 hapi_fhir_version_major==4
+//#define eq_3 hapi_fhir_version_major==3
+//#define eq_2 hapi_fhir_version_major==2
+
+//#define eq_3_8_0__4_0_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor>=8
+//#define gte_3_8_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=8 )
+//#define gte_3_7_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=7 )
+//#define eq_3_7_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor==7
+//#define in_3_0_0__3_7_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor<=6
+//#define in_3_0_0__3_7_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor<=6
+//#define gte_3_4_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=4 )
+//#define lt_3_4_0 !gte_3_4_0
+//#define gte_3_3_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=3 )
+//#define lt_3_3_0 !gte_3_3_0
 
 import hms.dbmi.ppm.JWTAuthenticationInterceptor;
 import hms.dbmi.ppm.JWTAuthorizationInterceptor;
 import hms.dbmi.ppm.MyLoggingInterceptor;
 
-import ca.uhn.fhir.jpa.binstore.DatabaseBlobBinaryStorageSvcImpl;
-import ca.uhn.fhir.jpa.binstore.IBinaryStorageSvc;
-import ca.uhn.fhir.jpa.model.entity.ModelConfig;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.hl7.fhir.dstu2.model.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,17 +46,47 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Driver;
 
-//#if hapi_fhir_version_major==5
+//#if eq_5
+import ca.uhn.fhir.jpa.model.entity.ModelConfig;
+import ca.uhn.fhir.jpa.binstore.DatabaseBlobBinaryStorageSvcImpl;
+import ca.uhn.fhir.jpa.binstore.IBinaryStorageSvc;
+import org.hl7.fhir.dstu2.model.Subscription;
 import ca.uhn.fhir.jpa.api.config.DaoConfig;
 import ca.uhn.fhir.jpa.model.config.PartitionSettings;
 import ca.uhn.fhir.jpa.subscription.channel.subscription.SubscriptionDeliveryHandlerFactory;
 import ca.uhn.fhir.jpa.subscription.match.deliver.email.IEmailSender;
 import ca.uhn.fhir.jpa.subscription.match.deliver.email.JavaMailEmailSender;
-//#else
-//$import ca.uhn.fhir.jpa.dao.DaoConfig;
+//#endif
+
+//#if eq_4
+//$import ca.uhn.fhir.jpa.model.entity.ModelConfig;
+//$import ca.uhn.fhir.jpa.binstore.DatabaseBlobBinaryStorageSvcImpl;
+//$import ca.uhn.fhir.jpa.binstore.IBinaryStorageSvc;
+//$import org.hl7.fhir.dstu2.model.Subscription;
 //$import ca.uhn.fhir.jpa.subscription.module.channel.SubscriptionDeliveryHandlerFactory;
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
 //$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.IEmailSender;
 //$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.JavaMailEmailSender;
+//#endif
+
+//#if eq_3
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
+
+//#if gte_3_7_0
+//$import ca.uhn.fhir.jpa.model.entity.ModelConfig;
+//$import org.hl7.fhir.instance.model.Subscription;
+//$import ca.uhn.fhir.jpa.subscription.module.cache.SubscriptionDeliveryHandlerFactory;
+//$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.IEmailSender;
+//$import ca.uhn.fhir.jpa.subscription.module.subscriber.email.JavaMailEmailSender;
+//#endif
+
+//#if in_3_0_0__3_7_0
+//#endif
+
+//#endif
+
+//#if eq_2
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
 //#endif
 
 /**
@@ -74,10 +124,11 @@ public class FhirServerConfigCommon {
     private Boolean emailStartTlsRequired = HapiProperties.getEmailStartTlsRequired();
     private Boolean emailQuitWait = HapiProperties.getEmailQuitWait();
 
-    //#if hapi_fhir_version_major==5
+    //#if eq_5
     @Autowired
     private ApplicationContext myAppCtx;
-    //#else
+    //#endif
+    //#if gte_3_7_0 && lt_5_0_0
     @Autowired
     private SubscriptionDeliveryHandlerFactory subscriptionDeliveryHandlerFactory;
     //#endif
@@ -123,13 +174,18 @@ public class FhirServerConfigCommon {
         retVal.setAutoCreatePlaceholderReferenceTargets(this.autoCreatePlaceholderReferenceTargets);
         retVal.setEnforceReferentialIntegrityOnWrite(this.enforceReferentialIntegrityOnWrite);
         retVal.setEnforceReferentialIntegrityOnDelete(this.enforceReferentialIntegrityOnDelete);
-        retVal.setAllowContainsSearches(this.allowContainsSearches);
-        retVal.setAllowMultipleDelete(this.allowMultipleDelete);
-        retVal.setAllowExternalReferences(this.allowExternalReferences);
-        retVal.setExpungeEnabled(this.expungeEnabled);
         retVal.setAutoCreatePlaceholderReferenceTargets(this.allowPlaceholderReferences);
+        retVal.setAllowExternalReferences(this.allowExternalReferences);
+        retVal.setAllowMultipleDelete(this.allowMultipleDelete);
+        //#if gte_3_3_0
+        retVal.setAllowContainsSearches(this.allowContainsSearches);
+        //#endif
+        //#if gte_3_4_0
+        retVal.setExpungeEnabled(this.expungeEnabled);
+        //#endif
+        //#if gte_3_7_0
         retVal.setEmailFromAddress(this.emailFrom);
-
+        //#endif
         Integer maxFetchSize = HapiProperties.getMaximumFetchSize();
         retVal.setFetchSizeDefaultMaximum(maxFetchSize);
         ourLog.info("Server configured to have a maximum fetch size of " + (maxFetchSize == Integer.MAX_VALUE ? "'unlimited'" : maxFetchSize));
@@ -141,6 +197,7 @@ public class FhirServerConfigCommon {
         Long retainCachedSearchesMinutes = HapiProperties.getExpireSearchResultsAfterMins();
         retVal.setExpireSearchResultsAfterMillis(retainCachedSearchesMinutes * 60 * 1000);
 
+        //#if gte_3_7_0
         // Subscriptions are enabled by channel type
         if (HapiProperties.getSubscriptionRestHookEnabled()) {
             ourLog.info("Enabling REST-hook subscriptions");
@@ -154,12 +211,15 @@ public class FhirServerConfigCommon {
             ourLog.info("Enabling websocket subscriptions");
             retVal.addSupportedSubscriptionType(Subscription.SubscriptionChannelType.WEBSOCKET);
         }
+        //#endif
 
+        //#if gte_4_0_0
         retVal.setFilterParameterEnabled(HapiProperties.getFilterSearchEnabled());
-
+        //#endif
         return retVal;
     }
 
+    //#if gte_3_7_0
     @Bean
     public ModelConfig modelConfig() {
         ModelConfig modelConfig = new ModelConfig();
@@ -179,6 +239,7 @@ public class FhirServerConfigCommon {
 
         return modelConfig;
     }
+    //#endif
 
     /**
      * The following bean configures the database connection. The 'url' property value of "jdbc:derby:directory:jpaserver_derby_files;create=true" indicates that the server should save resources in a
@@ -198,6 +259,7 @@ public class FhirServerConfigCommon {
         return retVal;
     }
 
+    //#if gte_4_0_0
     @Lazy
     @Bean
     public IBinaryStorageSvc binaryStorageSvc() {
@@ -209,14 +271,16 @@ public class FhirServerConfigCommon {
 
         return binaryStorageSvc;
     }
+    //#endif
 
-    //#if hapi_fhir_version_major==5
+    //#if eq_5
     @Bean
     public PartitionSettings partitionSettings() {
         return new PartitionSettings();
     }
     //#endif
 
+    //#if gte_3_7_0
     @Bean()
     public IEmailSender emailSender() {
         if (this.emailEnabled) {
@@ -232,7 +296,7 @@ public class FhirServerConfigCommon {
             //retVal.setStartTlsRequired(this.emailStartTlsRequired);
             //retVal.setQuitWait(this.emailQuitWait);
 
-            //#if hapi_fhir_version_major==5
+            //#if eq_5
             SubscriptionDeliveryHandlerFactory subscriptionDeliveryHandlerFactory = myAppCtx.getBean(SubscriptionDeliveryHandlerFactory.class);
             //#endif
             Validate.notNull(subscriptionDeliveryHandlerFactory, "No subscription delivery handler");
@@ -244,6 +308,7 @@ public class FhirServerConfigCommon {
 
         return null;
     }
+    //#endif
 
     @Bean(autowire = Autowire.BY_TYPE)
     @Conditional(OnJWTCondition.class)

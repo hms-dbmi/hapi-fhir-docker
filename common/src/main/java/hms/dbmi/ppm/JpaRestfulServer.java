@@ -1,23 +1,32 @@
 package hms.dbmi.ppm;
+//#define gte_5_0_0 hapi_fhir_version_major>=5
+//#define lt_5_0_0 hapi_fhir_version_major<5
+//#define gte_4_0_0 hapi_fhir_version_major>=4
+//#define lt_4_0_0 hapi_fhir_version_major<4
+//#define gte_3_0_0 hapi_fhir_version_major>=3
+//#define lt_3_0_0 hapi_fhir_version_major<3
+//#define gte_2_0_0 hapi_fhir_version_major>=2
+//#define lt_2_0_0 hapi_fhir_version_major<2
+
+//#define eq_5 hapi_fhir_version_major==5
+//#define eq_4 hapi_fhir_version_major==4
+//#define eq_3 hapi_fhir_version_major==3
+//#define eq_2 hapi_fhir_version_major==2
+
+//#define eq_3_8_0__4_0_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor>=8
+//#define gte_3_8_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=8 )
+//#define gte_3_7_0 hapi_fhir_version_major>=4 || ( hapi_fhir_version_major==3 && hapi_fhir_version_minor>=7 )
+//#define eq_3_7_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor==7
+//#define in_3_0_0__3_7_0 hapi_fhir_version_major==3 && hapi_fhir_version_minor<=6
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
-import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
-import ca.uhn.fhir.interceptor.api.IInterceptorService;
-import ca.uhn.fhir.jpa.binstore.BinaryStorageInterceptor;
-import ca.uhn.fhir.jpa.bulk.BulkDataExportProvider;
-import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
-import ca.uhn.fhir.jpa.provider.GraphQLProvider;
 import ca.uhn.fhir.jpa.provider.JpaConformanceProviderDstu2;
 import ca.uhn.fhir.jpa.provider.JpaSystemProviderDstu2;
-import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
-import ca.uhn.fhir.jpa.provider.TerminologyUploaderProvider;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaSystemProviderDstu3;
 import ca.uhn.fhir.jpa.provider.r4.JpaConformanceProviderR4;
 import ca.uhn.fhir.jpa.provider.r4.JpaSystemProviderR4;
-import ca.uhn.fhir.jpa.provider.r5.JpaConformanceProviderR5;
-import ca.uhn.fhir.jpa.provider.r5.JpaSystemProviderR5;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.model.dstu2.composite.MetaDt;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -29,7 +38,6 @@ import ca.uhn.fhir.rest.server.interceptor.RequestValidatingInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.ResponseValidatingInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.IServerInterceptor;
-import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -46,20 +54,77 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Collection;
 
+//#if eq_5
 import ca.uhn.fhir.jpa.searchparam.registry.ISearchParamRegistry;
-//#if hapi_fhir_version_major==5
 import ca.uhn.fhir.jpa.api.config.DaoConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.api.rp.ResourceProviderFactory;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
-//#else
+import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
+import ca.uhn.fhir.jpa.provider.r5.JpaConformanceProviderR5;
+import ca.uhn.fhir.jpa.provider.r5.JpaSystemProviderR5;
+import ca.uhn.fhir.jpa.binstore.BinaryStorageInterceptor;
+import ca.uhn.fhir.jpa.bulk.BulkDataExportProvider;
+import ca.uhn.fhir.jpa.provider.GraphQLProvider;
+import ca.uhn.fhir.jpa.provider.TerminologyUploaderProvider;
+import ca.uhn.fhir.validation.IValidatorModule;
+import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
+import ca.uhn.fhir.interceptor.api.IInterceptorService;
+import ca.uhn.fhir.jpa.api.rp.ResourceProviderFactory;
+import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
+//#endif
+
+//#if eq_4
 //$import ca.uhn.fhir.jpa.dao.DaoConfig;
 //$import ca.uhn.fhir.jpa.dao.DaoRegistry;
 //$import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
+//$import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
+//$import ca.uhn.fhir.jpa.provider.r5.JpaConformanceProviderR5;
+//$import ca.uhn.fhir.jpa.provider.r5.JpaSystemProviderR5;
+//$import ca.uhn.fhir.jpa.binstore.BinaryStorageInterceptor;
+//$import ca.uhn.fhir.jpa.bulk.BulkDataExportProvider;
+//$import ca.uhn.fhir.jpa.provider.GraphQLProvider;
+//$import ca.uhn.fhir.jpa.provider.TerminologyUploaderProvider;
+//$import ca.uhn.fhir.validation.IValidatorModule;
+//$import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
+//$import ca.uhn.fhir.interceptor.api.IInterceptorService;
 //$import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
 //$import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
 //$import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
+//$import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
+//#endif
+
+//#if eq_3
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
+//$import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
+
+//#if gte_3_8_0
+//$import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
+//$import ca.uhn.fhir.interceptor.api.IInterceptorService;
+//$import ca.uhn.fhir.jpa.util.ResourceProviderFactory;
+//$import ca.uhn.fhir.jpa.subscription.module.interceptor.SubscriptionDebugLogInterceptor;
+//#endif
+
+//#if eq_3_7_0
+//$import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
+//$import java.util.List;
+//$import ca.uhn.fhir.rest.server.IResourceProvider;
+//#endif
+
+//#if in_3_0_0__3_7_0
+//$import java.util.List;
+//$import ca.uhn.fhir.rest.server.IResourceProvider;
+//#endif
+
+//#endif
+
+//#if eq_2
+//$import ca.uhn.fhir.jpa.dao.DaoConfig;
+//$import ca.uhn.fhir.jpa.dao.IFhirSystemDao;
+//$import ca.uhn.fhir.jpa.subscription.SubscriptionInterceptorLoader;
+//$import java.util.List;
+//$import ca.uhn.fhir.rest.server.IResourceProvider;
 //#endif
 
 public class JpaRestfulServer extends RestfulServer {
@@ -84,37 +149,62 @@ public class JpaRestfulServer extends RestfulServer {
             supportedResourceTypes.add("SearchParameter");
         }
 
+        //#if gte_4_0_0
         if (!supportedResourceTypes.isEmpty()) {
             DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
             daoRegistry.setSupportedResourceTypes(supportedResourceTypes);
         }
+        //#endif
 
         /*
          * ResourceProviders are fetched from the Spring context
          */
         FhirVersionEnum fhirVersion = HapiProperties.getFhirVersion();
+        //#if gte_3_8_0
         ResourceProviderFactory resourceProviders;
+        //#else
+        //$List<IResourceProvider> resourceProviders;
+        //#endif
         Object systemProvider;
         if (fhirVersion == FhirVersionEnum.DSTU2) {
+            //#if gte_3_8_0
             resourceProviders = appCtx.getBean("myResourceProvidersDstu2", ResourceProviderFactory.class);
+            //#else
+            //$resourceProviders = appCtx.getBean("myResourceProvidersDstu2", List.class);
+            //#endif
             systemProvider = appCtx.getBean("mySystemProviderDstu2", JpaSystemProviderDstu2.class);
         } else if (fhirVersion == FhirVersionEnum.DSTU3) {
+            //#if gte_3_8_0
             resourceProviders = appCtx.getBean("myResourceProvidersDstu3", ResourceProviderFactory.class);
+            //#else
+            //$resourceProviders = appCtx.getBean("myResourceProvidersDstu3", List.class);
+            //#endif
             systemProvider = appCtx.getBean("mySystemProviderDstu3", JpaSystemProviderDstu3.class);
         } else if (fhirVersion == FhirVersionEnum.R4) {
+            //#if gte_3_8_0
             resourceProviders = appCtx.getBean("myResourceProvidersR4", ResourceProviderFactory.class);
+            //#else
+            //$resourceProviders = appCtx.getBean("myResourceProvidersR4", List.class);
+            //#endif
             systemProvider = appCtx.getBean("mySystemProviderR4", JpaSystemProviderR4.class);
+        //#if hapi_fhir_version_major >=4
         } else if (fhirVersion == FhirVersionEnum.R5) {
             resourceProviders = appCtx.getBean("myResourceProvidersR5", ResourceProviderFactory.class);
             systemProvider = appCtx.getBean("mySystemProviderR5", JpaSystemProviderR5.class);
+        //#endif
         } else {
             throw new IllegalStateException();
         }
 
         setFhirContext(appCtx.getBean(FhirContext.class));
 
+        //#if gte_3_8_0
         registerProviders(resourceProviders.createProviders());
         registerProvider(systemProvider);
+        //#else
+        //$setResourceProviders(resourceProviders);
+        //$setPlainProviders(systemProvider);
+        //#endif
 
         /*
          * The conformance provider exports the supported resources, search parameters, etc for
@@ -154,6 +244,7 @@ public class JpaRestfulServer extends RestfulServer {
             //#endif
             confProvider.setImplementationDescription("HAPI FHIR R4 Server");
             setServerConformanceProvider(confProvider);
+        //#if hapi_fhir_version_major >=4
         } else if (fhirVersion == FhirVersionEnum.R5) {
             IFhirSystemDao<org.hl7.fhir.r5.model.Bundle, org.hl7.fhir.r5.model.Meta> systemDao = appCtx
                     .getBean("mySystemDaoR5", IFhirSystemDao.class);
@@ -164,6 +255,7 @@ public class JpaRestfulServer extends RestfulServer {
             //#endif
             confProvider.setImplementationDescription("HAPI FHIR R5 Server");
             setServerConformanceProvider(confProvider);
+        //#endif
         } else {
             throw new IllegalStateException();
         }
@@ -235,6 +327,7 @@ public class JpaRestfulServer extends RestfulServer {
             setServerAddressStrategy(new HardcodedServerAddressStrategy(serverAddress));
         }
 
+        //#if hapi_fhir_version_major >= 4
         /*
          * If you are using DSTU3+, you may want to add a terminology uploader, which allows
          * uploading of external terminologies such as Snomed CT. Note that this uploader
@@ -245,7 +338,9 @@ public class JpaRestfulServer extends RestfulServer {
         if (false) { // <-- DISABLED RIGHT NOW
             registerProvider(appCtx.getBean(TerminologyUploaderProvider.class));
         }
+        //#endif
 
+        //#if hapi_fhir_version_major >= 4
         // If you want to enable the $trigger-subscription operation to allow
         // manual triggering of a subscription delivery, enable this provider
         if (false) { // <-- DISABLED RIGHT NOW
@@ -253,6 +348,7 @@ public class JpaRestfulServer extends RestfulServer {
                     .getBean(SubscriptionTriggeringProvider.class);
             registerProvider(retriggeringProvider);
         }
+        //#endif
 
         // Define your CORS configuration. This is an example
         // showing a typical setup. You should customize this
@@ -289,18 +385,22 @@ public class JpaRestfulServer extends RestfulServer {
         if (HapiProperties.getSubscriptionWebsocketEnabled() ||
                 HapiProperties.getSubscriptionEmailEnabled() ||
                 HapiProperties.getSubscriptionRestHookEnabled()) {
-            //#if hapi_fhir_version_major!=5
+            //#if lt_5_0_0 && gte_3_7_0
             // Loads subscription interceptors (SubscriptionActivatingInterceptor, SubscriptionMatcherInterceptor)
             // with activation of scheduled subscription
             SubscriptionInterceptorLoader subscriptionInterceptorLoader = appCtx
                     .getBean(SubscriptionInterceptorLoader.class);
             subscriptionInterceptorLoader.registerInterceptors();
             //#endif
+
+            //#if gte_3_8_0
             // Subscription debug logging
             IInterceptorService interceptorService = appCtx.getBean(IInterceptorService.class);
             interceptorService.registerInterceptor(new SubscriptionDebugLogInterceptor());
+            //#endif
         }
 
+        //#if gte_4_0_0
         // Cascading deletes
         DaoRegistry daoRegistry = appCtx.getBean(DaoRegistry.class);
         IInterceptorBroadcaster interceptorBroadcaster = appCtx.getBean(IInterceptorBroadcaster.class);
@@ -384,7 +484,7 @@ public class JpaRestfulServer extends RestfulServer {
         if (HapiProperties.getBulkExportEnabled()) {
             registerProvider(appCtx.getBean(BulkDataExportProvider.class));
         }
-
+        //#endif
     }
 
 }

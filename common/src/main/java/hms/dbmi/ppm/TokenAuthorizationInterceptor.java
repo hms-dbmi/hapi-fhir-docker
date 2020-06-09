@@ -46,7 +46,7 @@ public class TokenAuthorizationInterceptor extends AuthorizationInterceptor {
 
                 // Determine if the token is valid, ALL tokens are admin level
                 if(validateToken(token)) {
-                    System.out.println("Admin token: " + token);
+                    System.out.println("Admin token: " + token.substring(0, 3) + new String(new char[token.length() - 3]).replace('\0', '*'));
 
                     // Allow anything
                     return new RuleBuilder().allowAll().build();
@@ -88,6 +88,9 @@ public class TokenAuthorizationInterceptor extends AuthorizationInterceptor {
         }
 
         // Get the token from the header.
-        return header.substring(prefix.length(), header.length());
+        String token = header.substring(prefix.length(), header.length());
+
+        // Strip all non-alphanumeric characters
+        return token.replaceAll("[^a-zA-Z0-9]", "");
     }
 }
