@@ -1,33 +1,48 @@
 #!/bin/bash
 
-# Login to ECR
-$(aws ecr get-login --no-include-email --region us-east-1)
-
 # Set the build
-VERSION="0.3.0"
+VERSION="1.0.0"
 
-# Build 3.x.x versions
-VERSIONS_3="3.6.0,3.5.0,3.4.0,3.3.0,3.2.0,3.1.0,3.0.0"
-for v in ${VERSIONS_3//,/ }
+# Check if specific version
+if [[ -n "$1" ]]; then
+  VERSIONS="$1"
+else
+  VERSIONS="5.0.2,5.0.1,5.0.0,4.2.0,4.1.0,4.0.1,4.0.0,3.8.0,3.7.0,3.6.0,3.5.0,3.4.0,3.3.0,3.2.0,3.1.0,3.0.0,2.5,2.4"
+fi
+
+# Build all version
+for v in ${VERSIONS//,/ }
 do
+    # Get major, minor, patch
+    if [[ ${v%%.*} = "2" ]]; then
+      PATCH="0"
+      MINOR=${v##*.}
+      MAJOR=${v%%.*}
+    else
+      PATCH=${v##*.}
+      MINOR=`TMP=${v%.*}; echo ${TMP##*.}`
+      MAJOR=${v%%.*}
+    fi
+
     # Build and push
-    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${VERSION}" --build-arg HAPI_FHIR_PROFILE=default --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${v}" -t 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v} -t hmsdbmitc/ppm-fhir:${v} .
-    docker push 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}
+    docker build \
+      --build-arg DBMI_HAPI_FHIR_VERSION="${VERSION}" \
+      --build-arg HAPI_FHIR_VERSION_MAJOR="${MAJOR}" \
+      --build-arg HAPI_FHIR_VERSION_MINOR="${MINOR}" \
+      --build-arg HAPI_FHIR_VERSION_PATCH="${PATCH}" \
+      --build-arg HAPI_FHIR_VERSION="${v}" \
+      -t hmsdbmitc/hapi-fhir:${v} .
 
-    # Build and push overlay version
-    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${VERSION}" --build-arg HAPI_FHIR_PROFILE=overlay --build-arg HAPI_FHIR_SRC="hapi-fhir-3.x.x" --build-arg HAPI_FHIR_VERSION="${v}" -t 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}-overlay -t hmsdbmitc/ppm-fhir:${v}-overlay .
-    docker push 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}-overlay
-done
+    # Check if we should push it somewhere
+    if [[ -n $2 ]]; then
 
-# Build 2.x versions
-VERSIONS_2="2.5,2.4"
-for v in ${VERSIONS_2//,/ }
-do
-    # Build and push
-    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${VERSION}" --build-arg HAPI_FHIR_PROFILE=default --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${v}" -t 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v} -t hmsdbmitc/ppm-fhir:${v} .
-    docker push 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}
+      # Check if Amazon
+      if [[ $2 ~= "amazonaws.com" ]]; then
+        # Log int
+        $(aws ecr get-login --no-include-email --region us-east-1)
+      fi
 
-    # Build and push overlay version
-    docker build --build-arg DBMI_HAPI_FHIR_VERSION="${VERSION}" --build-arg HAPI_FHIR_PROFILE=overlay --build-arg HAPI_FHIR_SRC="hapi-fhir-2.x" --build-arg HAPI_FHIR_VERSION="${v}" -t 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}-overlay -t hmsdbmitc/ppm-fhir:${v}-overlay .
-    docker push 685606823951.dkr.ecr.us-east-1.amazonaws.com/ppm-fhir:${v}-overlay
+      docker tag hmsdbmitc/hapi-fhir:${v} $2/hapi-fhir:${v}
+      docker push $2/hapi-fhir:${v}
+    fi
 done
