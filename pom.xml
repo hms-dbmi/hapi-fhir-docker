@@ -30,74 +30,6 @@
 
 	<profiles>
 
-		<!-- These profiles determine whether to enable to overlay or not -->
-		<profile>
-			<id>overlay</id>
-			<properties>
-				<overlay-servlet><![CDATA[ -->
-    <servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextClass</param-name>
-			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-		</init-param>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-    <!-- ]]></overlay-servlet>
-				<overlay-servlet-mapping><![CDATA[ -->
-    <servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-    <!-- ]]></overlay-servlet-mapping>
-			</properties>
-		</profile>
-		<profile>
-			<id>default</id>
-			<properties>
-				<overlay-servlet></overlay-servlet>
-				<overlay-servlet-mapping></overlay-servlet-mapping>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-
-		<!-- These profiles determine the version of FHIR to activate -->
-		<profile>
-			<id>DSTU2</id>
-			<properties>
-				<fhir-version>DSTU2</fhir-version>
-			</properties>
-		</profile>
-		<profile>
-			<id>DSTU3</id>
-			<properties>
-				<fhir-version>DSTU3</fhir-version>
-			</properties>
-		</profile>
-		<profile>
-			<id>R4</id>
-			<properties>
-				<fhir-version>R4</fhir-version>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>R5</id>
-			<properties>
-				<fhir-version>R5</fhir-version>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-
 		<!-- These profiles determine the version of HAPI-FHIR to build -->
 		<profile>
 			<id>2.5.0</id>
@@ -470,7 +402,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.3</version>
 				<configuration>
+					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<archive>
 						<manifestEntries>
 							<Build-Time>${maven.build.timestamp}</Build-Time>
@@ -482,41 +417,9 @@
 							<artifactId>hapi-fhir-testpage-overlay</artifactId>
 						</overlay>
 					</overlays>
-					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+
 				</configuration>
 			</plugin>
-
-			<!-- This plugin is just a part of the HAPI internal build process, you do not need to incude it in your own projects -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>3.2.3</version>
-				<configuration>
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>src/main/webapp</directory>
-							<includes>
-								<include>**/web.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-					<filters>
-						<filter>${basedir}/src/main/resources/hapi.properties</filter>
-					</filters>
-					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-				</configuration>
-			</plugin>
-
 
 			<plugin>
 				<groupId>com.igormaznitsa</groupId>
@@ -538,7 +441,6 @@
 								<hapi_fhir_version_minor>${env.HAPI_FHIR_VERSION_MINOR}</hapi_fhir_version_minor>
 								<hapi_fhir_version_patch>${env.HAPI_FHIR_VERSION_PATCH}</hapi_fhir_version_patch>
 								<hapi_fhir_version>${env.HAPI_FHIR_VERSION}</hapi_fhir_version>
-								<fhir_version>${env.FHIR_VERSION}</fhir_version>
 							</vars>
 							<allowWhitespaces>true</allowWhitespaces>
 							<eol>\r\n</eol>
@@ -561,10 +463,6 @@
 							<clearTarget>true</clearTarget>
 							<replaceSources>true</replaceSources>
 							<careForLastEol>true</careForLastEol>
-							<excludeFolders>
-								<folder>./some1</folder>
-								<folder>./**/some2</folder>
-							</excludeFolders>
 							<preserveIndents>true</preserveIndents>
 							<dontOverwriteSameContent>false</dontOverwriteSameContent>
 							<skip>false</skip>

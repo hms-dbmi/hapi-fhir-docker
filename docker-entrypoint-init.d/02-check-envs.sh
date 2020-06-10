@@ -1,10 +1,11 @@
 #!/bin/bash -e
 
 # Ensure we have database properties
-:   ${FHIR_MYSQL_URL?: must be defined}
-:   ${FHIR_MYSQL_USERNAME?: must be defined}
-:   ${FHIR_MYSQL_PASSWORD?: must be defined}
-:   ${DBMI_APP_DOMAIN?: must be defined}
+:   ${HAPI_DATASOURCE_DRIVER?: must be defined}
+:   ${HAPI_DATASOURCE_URL?: must be defined}
+:   ${HAPI_DATASOURCE_USERNAME?: must be defined}
+:   ${HAPI_DATASOURCE_PASSWORD?: must be defined}
+:   ${HAPI_SERVER_ADDRESS?: must be defined}
 
 # Check static file envs
 if [ ! -z $JWT_AUTH_ENABLED ]; then

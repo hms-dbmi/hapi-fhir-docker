@@ -1,0 +1,65 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee xsd/web-app_3_0.xsd">
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>
+			hms.dbmi.ppm.ApplicationContext
+		</param-value>
+	</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+		</param-value>
+	</context-param>
+
+	<!-- Servlets -->
+
+	<servlet>
+		<servlet-name>fhirServlet</servlet-name>
+		<servlet-class>hms.dbmi.ppm.JpaRestfulServer</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+    {% if HAPI_FHIR_OVERLAY is defined and HAPI_FHIR_OVERLAY %}
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+		</init-param>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>hms.dbmi.ppm.FhirTesterConfig</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+    {% endif %}
+
+	<servlet-mapping>
+		<servlet-name>fhirServlet</servlet-name>
+		<url-pattern>/{{ FHIR_ROOT }}/*</url-pattern>
+	</servlet-mapping>
+
+    {% if HAPI_FHIR_OVERLAY is defined and HAPI_FHIR_OVERLAY %}
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+    {% endif %}
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Protected Context</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<user-data-constraint>
+			<transport-guarantee>{% if DBMI_SSL is defined and DBMI_SSL=="https" %}CONFIDENTIAL{% else %}NONE{% endif %}</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
+</web-app>

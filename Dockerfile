@@ -19,17 +19,6 @@ ENV HAPI_FHIR_VERSION_PATCH=${HAPI_FHIR_VERSION_PATCH}
 ARG HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
 ENV HAPI_FHIR_VERSION=${HAPI_FHIR_VERSION_MAJOR}.${HAPI_FHIR_VERSION_MINOR}.${HAPI_FHIR_VERSION_PATCH}
 
-# Enable the overlay by defining this argument
-ARG HAPI_FHIR_PROFILE=default
-
-# Set the version of HAPI-FHIR to use
-ARG FHIR_VERSION=R5
-ENV FHIR_VERSION=${FHIR_VERSION}
-
-# Set the webroot for the FHIR server
-ARG FHIR_ROOT=fhir
-ENV FHIR_ROOT=${FHIR_ROOT}
-
 # Fetch HAPI-FHIR source and build the app
 WORKDIR /usr/src/app/fhir-server
 
@@ -38,26 +27,13 @@ COPY pom.xml /usr/src/app/fhir-server/
 COPY settings.xml /usr/src/app/fhir-server/
 
 # Bring down packages first and cache them and save millions of minutes
-RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION} -P ${FHIR_VERSION}
+RUN mvn verify clean --fail-never -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_VERSION}
 
 # Copy our own source files over next
 COPY ${HAPI_FHIR_SRC} /usr/src/app/fhir-server
 
-# Copy templates
-RUN apk -Uuv add \
-    python3 \
-    py3-pip \
-    && pip3 install shinto-cli \
-    && rm -rf /var/cache/apk/*
-
-# Template the properties file to customize various aspects of the web server
-ADD docker-entrypoint-templates.d/ /docker-entrypoint-templates.d/
-RUN j2 /docker-entrypoint-templates.d/hapi.properties.j2 > /usr/src/app/fhir-server/src/main/resources/hapi.properties
-
 # Build the final WAR
-RUN mvn package -s /usr/src/app/fhir-server/settings.xml \
-    -P ${HAPI_FHIR_PROFILE} -P ${HAPI_FHIR_VERSION} -P ${FHIR_VERSION}
+RUN mvn compile war:exploded -s /usr/src/app/fhir-server/settings.xml -P ${HAPI_FHIR_VERSION}
 
 FROM tomcat:8-alpine
 
@@ -96,20 +72,21 @@ ENV DBMI_AWS_REGION=us-east-1
 # Set nginx and network parameters
 ENV DBMI_LB=true
 ENV DBMI_SSL=true
+ENV DBMI_HTTP_PORT=80
 ENV DBMI_CREATE_SSL=true
 
-ENV DBMI_HEALTHCHECK=true
-ENV DBMI_HEALTHCHECK_PATH=/healthcheck
-ENV DBMI_APP_HEALTHCHECK_PATH=/baseDstu3/metadata
-
-# Set FHIR variables
-ENV FHIR_SERVER_URL=https://${DBMI_APP_DOMAIN}/baseDstu3
-ENV FHIR_INTERNAL_SERVER_URL=http://localhost:8080/baseDstu3
+# Set web server variables
+ENV FHIR_VERSION=R5
+ENV HAPI_FHIR_OVERLAY=true
+ENV FHIR_ROOT=fhir
 ENV FHIR_SERVER_NAME="DBMI FHIR Server"
+ENV DBMI_HEALTHCHECK=true
+ENV DBMI_HEALTHCHECK_PATH=/${FHIR_ROOT}/metadata
+ENV DBMI_APP_HEALTHCHECK_PATH=/${FHIR_ROOT}/metadata
 
 # Copy the WAR file from builder
 RUN rm -rf $CATALINA_HOME/webapps/ROOT
-COPY --from=builder /usr/src/app/fhir-server/target/fhir-server.war $CATALINA_HOME/webapps/ROOT.war
+COPY --from=builder /usr/src/app/fhir-server/target/fhir-server $CATALINA_HOME/webapps/ROOT
 
 ENTRYPOINT ["dumb-init", "/docker-entrypoint.sh"]
 

@@ -11,6 +11,11 @@ fhir_version={{ FHIR_VERSION }}
 # at runtime.
 server_root={{ FHIR_ROOT }}
 
+# This defines whether SSL should be required for connections
+# or not. Set to 'CONFIDENTIAL' for required SSL and 'NONE'
+# for allowing insecure connections.
+server_transport_guarantee={% if DBMI_SSL is defined and DBMI_SSL == 'https' %}CONFIDENTIAL{% else %}NONE{% endif %}
+
 # Choose the authn/authz scheme, if 'jwt', request interceptors will be enabled
 # and will not let requests through that don't have a valid JWT according to the
 # tenant and client properties set at the container level
@@ -25,7 +30,7 @@ auth=jwt
 # (the web UI similar to the one at http://hapi.fhir.org) will use to
 # connect internally to the FHIR server, so this also needs to be a name
 # accessible from the server itself.
-server_address=http://localhost:8080/fhir/
+server_address={{ DBMI_SSL|default('https') }}://{{ DBMI_APP_DOMAIN|default('localhost') }}:{{ DBMI_PORT|default('443') }}/{{ FHIR_ROOT }}/
 
 enable_index_missing_fields=false
 auto_create_placeholder_reference_targets=false
