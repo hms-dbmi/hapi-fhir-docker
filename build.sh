@@ -37,7 +37,7 @@ do
     if [[ -n $2 ]]; then
 
       # Check if Amazon
-      if [[ $2 ~= "amazonaws.com" ]]; then
+      if [[ $2 =~ "amazonaws.com" ]]; then
         # Log int
         $(aws ecr get-login --no-include-email --region us-east-1)
       fi

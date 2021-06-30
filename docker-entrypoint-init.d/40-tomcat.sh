@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Check for self signed
-if [[ "$DBMI_SSL" = "https" ]] &&[[ -n "$DBMI_CREATE_SSL" ]]; then
+if [[ "$DBMI_SSL" = "https" ]] && [[ -n "$DBMI_CREATE_SSL" ]]; then
 
   # A blank passphrase
   export DBMI_CATALINA_SSL_PASSWORD="$(openssl rand -base64 15)"
@@ -50,6 +50,26 @@ if [[ "$DBMI_SSL" = "https" ]] &&[[ -n "$DBMI_CREATE_SSL" ]]; then
     -storepass "changeit" \
     -keypass "changeit"
 
+elif [[ "$DBMI_SSL" = "https" ]] && [[ -n "$DBMI_SSL_KEY" ]] && [[ -n "$DBMI_SSL_PKCS7" ]]; then
+
+  # Dump key and certs to file
+  echo "$DBMI_SSL_KEY" > private.key
+  echo "$DBMI_SSL_PKCS7" > cert.p7b
+
+  # Convert to PEM
+  openssl pkcs7 -print_certs -in cert.p7b -out cert.pem
+
+  # Convert to PKCS12
+  openssl pkcs12 -export \
+    -name ${DBMI_APP_DOMAIN} \
+    -in cert.pem \
+    -inkey private.key \
+    -out cert.p12
+
+  $JAVA_HOME/bin/keytool -importkeystore \
+    -srcstoretype pkcs12 \
+    -srckeystore cert.p12 \
+    -destkeystore "${DBMI_CATALINA_SSL_PATH}/${DBMI_APP_DOMAIN}.jks"
 fi
 
 # Setup the nginx and site configuration
